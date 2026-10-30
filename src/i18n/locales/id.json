@@ -1,0 +1,373 @@
+{
+  "common": {
+    "appName": "FRDUP",
+    "loading": "Memuat…",
+    "retry": "Coba lagi",
+    "cancel": "Batal",
+    "save": "Simpan",
+    "delete": "Hapus",
+    "confirm": "Konfirmasi",
+    "back": "Kembali",
+    "done": "Selesai",
+    "next": "Lanjut",
+    "skip": "Lewati",
+    "edit": "Edit",
+    "add": "Tambah",
+    "remove": "Hapus",
+    "restore": "Pulihkan",
+    "archive": "Arsipkan",
+    "search": "Cari",
+    "close": "Tutup",
+    "share": "Bagikan",
+    "copy": "Salin",
+    "copied": "Tersalin!",
+    "yes": "Ya",
+    "no": "Tidak",
+    "or": "atau",
+    "allSports": "Semua Olahraga",
+    "version": "Versi"
+  },
+  "onboarding": {
+    "step1": {
+      "title": "Panggil kamu siapa?",
+      "placeholder": "Nama kamu",
+      "cta": "Mulai"
+    },
+    "step2": {
+      "title": "Olahraga favorit?",
+      "subtitle": "Bisa diubah nanti",
+      "cta": "Lanjut"
+    },
+    "step3": {
+      "title": "Tambah pemain",
+      "subtitle": "Paste nama dari WhatsApp — satu nama per baris",
+      "bulkPlaceholder": "Nama pemain, satu per baris…",
+      "singlePlaceholder": "Nama pemain",
+      "cta": "Mulai Main",
+      "skip": "Lewati, tambah nanti"
+    }
+  },
+  "roster": {
+    "title": "Pemain",
+    "empty": {
+      "title": "Belum ada pemain",
+      "subtitle": "Tambah pemain untuk mulai sesi"
+    },
+    "addPlayer": "Tambah Pemain",
+    "searchPlaceholder": "Cari nama…",
+    "archived": "Diarsipkan",
+    "showArchived": "Tampilkan arsip",
+    "hideArchived": "Sembunyikan arsip",
+    "sortBy": "Urutkan",
+    "sortName": "Nama",
+    "sortLastPlayed": "Terakhir main",
+    "sortTier": "Tier",
+    "newPlayer": {
+      "title": "Pemain Baru",
+      "nameLabel": "Nama",
+      "namePlaceholder": "Nama lengkap",
+      "nicknameLabel": "Panggilan (opsional)",
+      "nicknamePlaceholder": "Nama pendek",
+      "phoneLabel": "Nomor WhatsApp (opsional)",
+      "phonePlaceholder": "08xxx",
+      "guest": "Pemain tamu (tidak masuk ranking)",
+      "cta": "Simpan"
+    },
+    "editPlayer": {
+      "title": "Edit Pemain",
+      "archiveConfirm": "Arsipkan {{name}}?",
+      "archiveDetail": "Pemain tidak akan muncul di daftar roster, tapi riwayat tetap tersimpan.",
+      "deleteConfirm": "Hapus {{name}} permanen?",
+      "deleteDetail": "Semua riwayat dan statistik akan terhapus. Tidak bisa dibatalkan.",
+      "cta": "Simpan Perubahan"
+    },
+    "stats": {
+      "title": "Statistik",
+      "matchesPlayed": "Pertandingan",
+      "wins": "Menang",
+      "winRate": "Win Rate",
+      "pointsFor": "Poin Masuk",
+      "pointsAgainst": "Poin Kemasukan",
+      "sessionsPlayed": "Sesi",
+      "noData": "Belum ada data untuk olahraga ini"
+    }
+  },
+  "session": {
+    "setup": {
+      "title": "Sesi Baru",
+      "stepSport": "Olahraga & Pemain",
+      "stepCourts": "Lapangan",
+      "stepFormat": "Format",
+      "selectSport": "Pilih Olahraga",
+      "selectPlayers": "Pilih Pemain",
+      "selectAll": "Pilih semua",
+      "deselectAll": "Batalkan semua",
+      "addGuest": "+ Tamu",
+      "playerCount_one": "{{count}} pemain dipilih",
+      "playerCount_other": "{{count}} pemain dipilih",
+      "notEnoughPlayers": "Butuh minimal {{min}} pemain",
+      "courts": {
+        "title": "Pengaturan Lapangan",
+        "count": "Jumlah Lapangan",
+        "label": "Label",
+        "targetRounds": "Target Ronde",
+        "duration": "Durasi",
+        "fairnessPreview": "{{players}} pemain, {{courts}} lapangan → {{playing}} main, {{resting}} istirahat tiap ronde"
+      },
+      "format": {
+        "title": "Format Permainan",
+        "americano": "Americano",
+        "mexicano": "Mexicano",
+        "team_fixed": "Tim Tetap",
+        "free": "Bebas",
+        "americanoDesc": "Pasangan rotasi, poin individu",
+        "mexicanoDesc": "Pasangan berdasarkan klasemen",
+        "teamFixedDesc": "Tim tetap sepanjang sesi",
+        "freeDesc": "Host mengatur sendiri"
+      },
+      "cta": "Mulai Sesi"
+    },
+    "court": {
+      "title": "Lapangan",
+      "ronde": "Ronde {{number}}",
+      "nextRound": "Ronde Berikutnya",
+      "nextRoundConfirm": "Mulai ronde {{number}}?",
+      "allMatchesMustComplete": "Semua pertandingan harus selesai dulu",
+      "resting": "Istirahat",
+      "noResting": "Semua pemain aktif",
+      "vsLabel": "vs",
+      "startMatch": "Mulai",
+      "completeMatch": "Selesai",
+      "reopenMatch": "Buka Ulang",
+      "voidMatch": "Batalkan",
+      "editScore": "Edit Skor",
+      "swapPlayers": "Tukar Pemain",
+      "substitute": "Ganti Pemain",
+      "claimCourt": "Klaim Lapangan",
+      "courtClaimed": "Diklaim",
+      "scoreUpdatedByCohost": "Skor lapangan {{court}} diperbarui oleh {{device}}"
+    },
+    "standings": {
+      "title": "Klasemen",
+      "rank": "#",
+      "player": "Pemain",
+      "played": "Main",
+      "wins": "M",
+      "losses": "K",
+      "points": "Poin",
+      "diff": "+/-",
+      "winRate": "WR",
+      "noData": "Belum ada pertandingan selesai"
+    },
+    "rounds": {
+      "title": "Ronde",
+      "round": "Ronde {{number}}",
+      "completed": "Selesai",
+      "inProgress": "Berlangsung",
+      "scheduled": "Dijadwalkan",
+      "editScoreNotice": "Klasemen & ronde berikutnya akan menyesuaikan.",
+      "regenerate": "Buat Ulang Ronde",
+      "seed": "Seed: {{seed}} · Cost: {{cost}}"
+    },
+    "finish": {
+      "title": "Selesaikan Sesi",
+      "incompleteMatches": "{{count}} pertandingan belum selesai",
+      "voidRemaining": "Batalkan sisa pertandingan",
+      "podium": "Podium",
+      "rpDelta": "Perubahan RP",
+      "gained": "+{{rp}} RP",
+      "lost": "{{rp}} RP",
+      "noChange": "Tidak ada perubahan",
+      "tierUp": "Naik Tier! 🎉",
+      "skipAll": "Lewati semua",
+      "continueToBill": "Lanjut ke Tagihan",
+      "sessionAlreadyCommitted": "Sesi ini sudah diselesaikan"
+    }
+  },
+  "bill": {
+    "title": "Tagihan",
+    "addItem": "Tambah Item",
+    "noItems": "Belum ada item tagihan",
+    "itemKind": {
+      "court_fee": "Sewa Lapangan",
+      "shared": "Bersama",
+      "rental": "Rental",
+      "individual": "Perorangan"
+    },
+    "preset": {
+      "courtRental": "Sewa Lapangan",
+      "shuttlecock": "Shuttlecock",
+      "racketRental": "Sewa Raket",
+      "parking": "Parkir",
+      "water": "Air Minum",
+      "balls": "Bola"
+    },
+    "quantity": "Jumlah",
+    "unitPrice": "Harga Satuan",
+    "total": "Total",
+    "payers": "Dibayar oleh",
+    "allParticipants": "Semua peserta",
+    "broughtOwn": "Bawa sendiri",
+    "broughtOwnHint": "Centang pemain yang bawa alat sendiri — mereka tidak kena biaya rental",
+    "subtotal": "Subtotal",
+    "roundingLine": "Pembulatan (ditanggung host): {{amount}}",
+    "settlements": "Rincian Pembayaran",
+    "export": "Ekspor",
+    "copyWhatsapp": "Salin ke WhatsApp",
+    "shareWhatsapp": "Kirim via WhatsApp",
+    "exportImage": "Simpan sebagai Gambar",
+    "rounding": {
+      "title": "Pembulatan",
+      "100": "Per Rp 100",
+      "500": "Per Rp 500",
+      "1000": "Per Rp 1.000"
+    },
+    "error": {
+      "noPayers": "Pilih minimal 1 pemain untuk item ini"
+    }
+  },
+  "rank": {
+    "tier": {
+      "warrior": "Warrior",
+      "elite": "Elite",
+      "master": "Master",
+      "grandmaster": "Grandmaster",
+      "epic": "Epic",
+      "legend": "Legend",
+      "mythic": "Mythic"
+    },
+    "division": "Divisi {{number}}",
+    "stars": "{{count}} bintang",
+    "mythicPoints": "{{points}} poin",
+    "rpToNextStar": "{{rp}} RP ke bintang berikutnya"
+  },
+  "sport": {
+    "padel": {
+      "name": "Padel",
+      "court": "Lapangan",
+      "settings": {
+        "fixedTotal": "Total Poin per Game",
+        "fixedTotalOption16": "16 poin",
+        "fixedTotalOption21": "21 poin",
+        "fixedTotalOption24": "24 poin",
+        "fixedTotalOption32": "32 poin"
+      }
+    },
+    "badminton": {
+      "name": "Badminton",
+      "court": "Lapangan",
+      "settings": {
+        "targetScore": "Target Skor",
+        "singleMode": "Mode Tunggal (1v1)"
+      }
+    },
+    "pingpong": {
+      "name": "Tenis Meja",
+      "court": "Meja",
+      "settings": {
+        "targetScore": "Target Skor",
+        "target11": "11 poin",
+        "target15": "15 poin",
+        "target21": "21 poin",
+        "doublesMode": "Mode Ganda (2v2)"
+      }
+    },
+    "billiard": {
+      "name": "Biliar",
+      "court": "Meja",
+      "settings": {
+        "doublesMode": "Mode Ganda (2v2)"
+      }
+    },
+    "mahjong": {
+      "name": "Mahjong",
+      "court": "Meja",
+      "settings": {}
+    }
+  },
+  "error": {
+    "generic": "Terjadi kesalahan. Coba lagi.",
+    "offline": "Tidak ada koneksi internet.",
+    "sessionNotFound": "Sesi tidak ditemukan.",
+    "joinCodeInvalid": "Kode tidak valid.",
+    "joinCodeExpired": "Kode sudah kedaluwarsa.",
+    "score": {
+      "negative": "Skor tidak boleh negatif",
+      "fixedSumMismatch": "Jumlah skor harus {{total}}",
+      "exceedsCap": "Skor tidak boleh melebihi {{cap}}",
+      "exceedsTarget": "Skor tidak boleh melebihi {{target}}",
+      "matchAlreadyDecided": "Pertandingan sudah selesai"
+    }
+  },
+  "settings": {
+    "title": "Pengaturan",
+    "hostName": "Nama Host",
+    "language": "Bahasa",
+    "languageId": "Indonesia",
+    "languageEn": "English",
+    "rounding": "Pembulatan Tagihan",
+    "payment": {
+      "title": "Info Pembayaran",
+      "bank": "Bank",
+      "accountNumber": "Nomor Rekening",
+      "accountHolder": "Nama Pemilik",
+      "qris": "Upload QRIS",
+      "note": "Catatan"
+    },
+    "sports": "Pengaturan Olahraga",
+    "data": {
+      "title": "Data",
+      "export": "Ekspor Cadangan",
+      "restore": "Pulihkan dari Cadangan",
+      "syncStatus": "Status Sinkronisasi",
+      "pendingWrites": "{{count}} perubahan menunggu sinkronisasi",
+      "resetApp": "Reset Aplikasi",
+      "resetConfirm": "Hapus semua data?",
+      "resetDetail": "Semua data, statistik, dan sesi akan dihapus permanen. TIDAK BISA DIBATALKAN."
+    }
+  },
+  "home": {
+    "title": "Beranda",
+    "resumeBanner": {
+      "title": "Sesi berlangsung",
+      "cta": "Lanjutkan"
+    },
+    "newSession": "Mulai Sesi",
+    "recentSessions": "Sesi Terakhir",
+    "noSessions": "Belum ada sesi. Yuk mulai!",
+    "highlights": {
+      "topWinner": "Paling sering menang bulan ini",
+      "newTier": "Naik tier terbaru",
+      "totalSessions": "Total sesi bulan ini"
+    }
+  },
+  "history": {
+    "title": "Riwayat",
+    "empty": "Belum ada sesi selesai",
+    "filterBySport": "Filter olahraga",
+    "recap": {
+      "title": "Rekap Sesi",
+      "players": "Pemain",
+      "rounds": "Ronde",
+      "duration": "Durasi",
+      "viewBill": "Lihat Tagihan"
+    }
+  },
+  "sync": {
+    "idle": "Tersinkron",
+    "syncing": "Menyinkron…",
+    "offline": "Offline",
+    "error": "Gagal sinkron"
+  },
+  "cohost": {
+    "joinCode": "Kode Gabung",
+    "joinCodeExpiry": "Berlaku {{duration}}",
+    "renewCode": "Perbarui Kode",
+    "disableCode": "Matikan Kode",
+    "connectedDevices": "Perangkat Terhubung",
+    "joinTitle": "Gabung Sesi",
+    "joinSubtitle": "Masukkan kode 6 karakter dari host",
+    "joining": "Menghubungkan…",
+    "joined": "Berhasil bergabung!"
+  }
+}

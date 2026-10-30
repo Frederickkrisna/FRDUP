@@ -1,0 +1,306 @@
+@import 'tailwindcss';
+@import './tokens.css';
+
+/* Latin subsets only, self-hosted and hashed by Vite (no CDN: required for reliable image export). */
+@font-face {
+  font-family: 'Plus Jakarta Sans';
+  font-style: normal;
+  font-weight: 200 800;
+  font-display: swap;
+  src: url('@fontsource-variable/plus-jakarta-sans/files/plus-jakarta-sans-latin-wght-normal.woff2')
+    format('woff2-variations');
+}
+@font-face {
+  font-family: 'JetBrains Mono';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url('@fontsource/jetbrains-mono/files/jetbrains-mono-latin-500-normal.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'JetBrains Mono';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url('@fontsource/jetbrains-mono/files/jetbrains-mono-latin-700-normal.woff2') format('woff2');
+}
+
+@theme inline {
+  --color-bg: var(--c-bg);
+  --color-surface: var(--c-surface);
+  --color-surface-2: var(--c-surface-2);
+  --color-surface-3: var(--c-surface-3);
+  --color-line: var(--c-border);
+  --color-line-strong: var(--c-border-strong);
+  --color-ink: var(--c-text);
+  --color-ink-muted: var(--c-text-muted);
+  --color-ink-faint: var(--c-text-faint);
+  --color-primary: var(--c-primary);
+  --color-primary-on: var(--c-primary-on);
+  --color-primary-dim: var(--c-primary-dim);
+  --color-success: var(--c-success);
+  --color-success-on: var(--c-success-on);
+  --color-danger: var(--c-danger);
+  --color-danger-on: var(--c-danger-on);
+  --color-warning: var(--c-warning);
+  --color-warning-on: var(--c-warning-on);
+  --color-info: var(--c-info);
+  --color-info-on: var(--c-info-on);
+
+  --radius-sm: var(--r-sm);
+  --radius-md: var(--r-md);
+  --radius-lg: var(--r-lg);
+  --radius-xl: var(--r-xl);
+
+  --font-sans: 'Plus Jakarta Sans', system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, monospace;
+
+  --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+@layer base {
+  *,
+  *::before,
+  *::after {
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  html {
+    height: 100%;
+    background: var(--c-bg);
+    color: var(--c-text);
+    font-family: var(--font-sans);
+    font-size: 16px;
+    line-height: 1.45;
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+    font-synthesis: none;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    overscroll-behavior: none;
+  }
+
+  body {
+    min-height: 100%;
+    margin: 0;
+    background: var(--c-bg);
+    overscroll-behavior: none;
+    touch-action: manipulation;
+  }
+
+  #root {
+    min-height: 100dvh;
+  }
+
+  button,
+  a,
+  [role='button'],
+  [role='tab'],
+  summary,
+  label {
+    touch-action: manipulation;
+  }
+
+  button {
+    font: inherit;
+    color: inherit;
+    cursor: pointer;
+  }
+
+  /* iOS Safari zooms the page when a focused field is under 16px. */
+  input,
+  select,
+  textarea {
+    font: inherit;
+    font-size: max(16px, 1em);
+    color: inherit;
+  }
+
+  ::selection {
+    background: var(--c-primary);
+    color: var(--c-primary-on);
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--c-primary);
+    outline-offset: 2px;
+    border-radius: var(--r-sm);
+  }
+
+  /* Themed scrollbars (desktop preview / Android Chrome). */
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: var(--c-border-strong) transparent;
+  }
+
+  input::placeholder,
+  textarea::placeholder {
+    color: var(--c-text-faint);
+  }
+
+  input,
+  textarea {
+    caret-color: var(--c-primary);
+  }
+
+  /* Numerals in data are always tabular. */
+  .num {
+    font-family: var(--font-mono);
+    font-variant-numeric: tabular-nums;
+    font-feature-settings: 'tnum' 1;
+  }
+}
+
+@layer utilities {
+  .no-select {
+    -webkit-user-select: none;
+    user-select: none;
+    -webkit-touch-callout: none;
+  }
+  .pt-safe {
+    padding-top: var(--safe-top);
+  }
+  .pb-safe {
+    padding-bottom: var(--safe-bottom);
+  }
+  .h-screen-dvh {
+    height: 100dvh;
+  }
+  .scroll-y {
+    overflow-y: auto;
+    overscroll-behavior-y: contain;
+    -webkit-overflow-scrolling: touch;
+  }
+  .hide-scrollbar {
+    scrollbar-width: none;
+  }
+  .hide-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+/* Press feedback: scale(0.97) on every pressable. Hover only where hover exists. */
+.pressable {
+  transition:
+    transform var(--dur-press) var(--ease-out),
+    background-color var(--dur-ui) ease,
+    border-color var(--dur-ui) ease,
+    opacity var(--dur-ui) ease;
+}
+.pressable:active:not(:disabled):not([aria-disabled='true']) {
+  transform: scale(0.97);
+}
+@media (hover: hover) and (pointer: fine) {
+  .pressable-hover:hover:not(:disabled) {
+    background-color: var(--c-surface-3);
+  }
+}
+
+/* Reduced motion: keep opacity/colour changes, drop movement. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+  }
+  .pressable:active:not(:disabled) {
+    transform: none;
+  }
+}
+
+/* Motion primitives. Only transform/opacity are animated. */
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+.spin {
+  animation: spin 640ms linear infinite;
+}
+
+@keyframes rise-in {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.rise-in {
+  animation: rise-in 260ms var(--ease-out) both;
+  animation-delay: calc(var(--i, 0) * 40ms);
+}
+
+@keyframes fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+.fade-in {
+  animation: fade-in 200ms ease both;
+}
+
+@keyframes pulse-dot {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.35; }
+}
+.pulse-dot {
+  animation: pulse-dot 1600ms ease-in-out infinite;
+}
+
+@keyframes sheen {
+  from { transform: translateX(-140%) skewX(-18deg); }
+  to { transform: translateX(240%) skewX(-18deg); }
+}
+.sheen {
+  animation: sheen 2600ms var(--ease-in-out) infinite;
+}
+
+@keyframes skeleton {
+  0%, 100% { opacity: 0.55; }
+  50% { opacity: 1; }
+}
+.skeleton {
+  background: var(--c-surface-2);
+  border-radius: var(--r-md);
+  animation: skeleton 1400ms ease-in-out infinite;
+}
+
+@keyframes flash-border {
+  0% { box-shadow: 0 0 0 0 var(--c-primary); }
+  40% { box-shadow: 0 0 0 2px var(--c-primary); }
+  100% { box-shadow: 0 0 0 0 transparent; }
+}
+.flash-border {
+  animation: flash-border 420ms var(--ease-out);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .rise-in { animation: fade-in 160ms ease both; animation-delay: 0ms; }
+  .sheen, .pulse-dot, .flash-border { animation: none; }
+  .spin { animation-duration: 1600ms; }
+}
+/* Score digit: rolls up 140ms when the value changes (re-keyed by the component). */
+@keyframes roll-up {
+  from { opacity: 0; transform: translateY(35%); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.roll {
+  display: inline-block;
+  animation: roll-up 140ms var(--ease-out) both;
+}
+@media (prefers-reduced-motion: reduce) {
+  .roll { animation: fade-in 120ms ease both; }
+}
+/* Opacity-only ring flash on score change (no layout/paint-heavy shadow animation). */
+@keyframes ring-out {
+  0% { opacity: 0.95; }
+  100% { opacity: 0; }
+}
+.flash-ring {
+  animation: ring-out 380ms var(--ease-out) both;
+}
+@media (prefers-reduced-motion: reduce) {
+  .flash-ring { animation-duration: 160ms; }
+}
+/* Invisible 6px of extra hit area around score buttons (sweaty thumbs miss); gap-3 keeps slops from overlapping. */
+.hit-slop::after {
+  content: '';
+  position: absolute;
+  inset: -6px;
+}

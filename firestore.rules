@@ -1,0 +1,100 @@
+rules_version = '2';
+
+// FRDUP security rules. See docs/implementation_be.md §4.
+//
+// Notes vs. the original sketch (recorded in docs/migration_web.md):
+//  * Time fields are Firestore Timestamps on the wire, so comparisons use `request.time`,
+//    not epoch millis.
+//  * `hostId === anon uid`, so list queries are constrained on `hostId` (rules cannot prove a
+//    query filters on `hostAnonUid` unless the client filters on exactly that field).
+//  * A session_codes `get` on a missing document must not error, so the client can probe for
+//    collisions before issuing a code.
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function signedIn() { return request.auth != null; }
+    function uid()      { return request.auth.uid; }
+
+    /* ---------- Host-owned subtree: only the owning device ---------- */
+    match /hosts/{hostId} {
+      allow read, write: if signedIn() && uid() == hostId;
+
+      match /{document=**} {
+        allow read, write: if signedIn() && uid() == hostId;
+      }
+    }
+
+    /* ---------- Join codes: knowing the code is the credential; `get` only, never `list` ---------- */
+    match /session_codes/{code} {
+      allow get: if signedIn() && (resource == null || resource.data.expiresAt > request.time);
+      allow list: if false;
+      allow create: if signedIn()
+                    && request.resource.data.hostAnonUid == uid()
+                    && request.resource.data.expiresAt is timestamp;
+      allow update, delete: if signedIn() && resource.data.hostAnonUid == uid();
+    }
+
+    /* ---------- Sessions ---------- */
+    match /sessions/{sessionId} {
+
+      function isSessionHost() {
+        return signedIn() && resource.data.hostId == uid();
+      }
+      function isCoHost() {
+        return signedIn() &&
+          exists(/databases/$(database)/documents/sessions/$(sessionId)/cohosts/$(uid()));
+      }
+      function joinWindowOpen() {
+        return resource.data.joinCode != null
+            && resource.data.joinCodeExpiresAt != null
+            && resource.data.joinCodeExpiresAt > request.time;
+      }
+
+      allow get: if isSessionHost() || isCoHost() || (signedIn() && joinWindowOpen());
+      allow list: if signedIn() && resource.data.hostId == uid() && request.query.limit <= 100;
+      allow create: if signedIn()
+                    && request.resource.data.hostId == uid()
+                    && request.resource.data.hostAnonUid == uid();
+      allow update: if isSessionHost() && request.resource.data.hostId == resource.data.hostId;
+      allow delete: if isSessionHost();
+
+      /* Co-host registry: a device may only create/maintain its OWN entry. */
+      match /cohosts/{coHostUid} {
+        function parentSession() {
+          return get(/databases/$(database)/documents/sessions/$(sessionId)).data;
+        }
+        allow read: if signedIn() && (parentSession().hostId == uid() || coHostUid == uid());
+        allow create: if signedIn() && coHostUid == uid()
+                      && request.resource.data.id == uid()
+                      && parentSession().joinCode != null
+                      && parentSession().joinCodeExpiresAt != null
+                      && parentSession().joinCodeExpiresAt > request.time;
+        allow update: if signedIn() && coHostUid == uid();
+        allow delete: if signedIn() && (coHostUid == uid() || parentSession().hostId == uid());
+      }
+
+      /* Rounds: host writes freely; registered co-hosts may write scores. */
+      match /rounds/{roundId} {
+        function parentSession() {
+          return get(/databases/$(database)/documents/sessions/$(sessionId)).data;
+        }
+        function isHostOfSession() { return signedIn() && parentSession().hostId == uid(); }
+        function isRegisteredCoHost() {
+          return signedIn() &&
+            exists(/databases/$(database)/documents/sessions/$(sessionId)/cohosts/$(uid()));
+        }
+        allow read, write: if isHostOfSession() || isRegisteredCoHost();
+      }
+
+      /* Bill: host only. Money is not co-host business. */
+      match /bill/{billId} {
+        allow read, write: if signedIn()
+          && get(/databases/$(database)/documents/sessions/$(sessionId)).data.hostId == uid();
+      }
+    }
+
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

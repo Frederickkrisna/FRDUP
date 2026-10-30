@@ -1,0 +1,396 @@
+{
+  "common": {
+    "undo": "Urungkan",
+    "on": "Aktif",
+    "off": "Mati",
+    "increase": "Tambah",
+    "decrease": "Kurangi",
+    "next": "Lanjut"
+  },
+  "nav": {
+    "label": "Navigasi utama",
+    "home": "Beranda",
+    "roster": "Pemain",
+    "history": "Riwayat",
+    "settings": "Atur"
+  },
+  "boot": {
+    "config": {
+      "title": "Konfigurasi Firebase belum diisi",
+      "body": "Isi variabel berikut di file .env.local, lalu jalankan ulang aplikasi."
+    },
+    "auth": {
+      "title": "Butuh internet sebentar",
+      "body": "Untuk pertama kali, FRDUP perlu online sekali supaya bisa menyiapkan data kamu. Setelah itu bisa dipakai tanpa sinyal."
+    },
+    "identity": {
+      "title": "Data lama tidak ditemukan",
+      "body": "Data situs di browser ini sepertinya terhapus, jadi akun anonim kamu berganti. Kalau punya file cadangan, pulihkan di sini. Kalau tidak, mulai dari awal.",
+      "restore": "Pulihkan dari cadangan",
+      "startFresh": "Mulai dari awal"
+    }
+  },
+  "pwa": {
+    "updateAvailable": "Versi baru tersedia.",
+    "updateAction": "Perbarui",
+    "offlineReady": "Siap dipakai tanpa internet.",
+    "install": {
+      "title": "Pasang FRDUP di layar utama",
+      "body": "Lebih cepat dibuka, tampil layar penuh, dan datamu lebih aman dari penghapusan otomatis browser.",
+      "cta": "Pasang",
+      "iosStep1": "Ketuk",
+      "iosStep2": "lalu pilih",
+      "iosStep3": "“Tambahkan ke Layar Utama”.",
+      "shareIcon": "tombol Bagikan",
+      "addIcon": "Tambah ke Layar Utama"
+    }
+  },
+  "backup": {
+    "reminder_other": "Sudah {{count}} sesi sejak cadangan terakhir. Simpan cadangan supaya datamu aman.",
+    "later": "Nanti",
+    "now": "Cadangkan"
+  },
+  "error": {
+    "notFound": {
+      "title": "Halaman tidak ditemukan",
+      "body": "Alamatnya mungkin salah atau sudah dipindah.",
+      "cta": "Ke beranda"
+    },
+    "route": {
+      "title": "Ada yang tidak beres",
+      "body": "Sesi yang sedang berjalan tetap aman. Coba muat ulang halaman ini.",
+      "home": "Ke beranda"
+    }
+  },
+  "onboarding": {
+    "progress": "Langkah {{step}} dari {{total}}",
+    "step1": {
+      "subtitle": "Nama ini tampil di papan skor dan tagihan yang kamu bagikan.",
+      "label": "Namamu"
+    },
+    "step3": {
+      "label": "Daftar nama",
+      "count_other": "{{count}} nama terdeteksi"
+    }
+  },
+  "home": {
+    "greeting": "Halo,",
+    "seeAll": "Lihat semua",
+    "noSessionsBody": "Sesi yang sudah selesai akan muncul di sini.",
+    "leaderboards": "Papan peringkat",
+    "resumeBanner": {
+      "aria": "Lanjutkan sesi {{sport}}",
+      "meta": "Ronde {{round}} · {{elapsed}}"
+    }
+  },
+  "roster": {
+    "guestTag": "Tamu",
+    "archivedTag": "Diarsipkan",
+    "matchesCount_other": "{{count}} main",
+    "noMatchesYet": "Belum ada pertandingan",
+    "filterSport": "Filter olahraga",
+    "saved": "Pemain tersimpan.",
+    "restored": "Pemain dikembalikan.",
+    "archivedToast": "{{name}} diarsipkan.",
+    "notFound": "Pemain tidak ditemukan",
+    "error": {
+      "title": "Daftar pemain belum termuat",
+      "body": "Cek koneksimu lalu coba lagi."
+    },
+    "noResults": {
+      "title": "Tidak ada yang cocok",
+      "body": "Tidak ada pemain dengan nama “{{query}}”."
+    },
+    "newPlayer": {
+      "nameRequired": "Nama wajib diisi"
+    },
+    "profile": {
+      "rank": "Peringkat",
+      "sport": "Olahraga",
+      "leaderboard": "Lihat papan peringkat"
+    }
+  },
+  "history": {
+    "emptyBody": "Selesaikan satu sesi dan rekapnya muncul di sini.",
+    "loadMore": "Muat lebih banyak",
+    "error": {
+      "title": "Riwayat belum termuat",
+      "body": "Cek koneksimu lalu coba lagi."
+    },
+    "row": {
+      "meta": "{{rounds}} ronde · {{players}} pemain"
+    }
+  },
+  "board": {
+    "title": "Papan peringkat",
+    "rankLabel": "Peringkat {{rank}}",
+    "record": "{{wins}}M · {{losses}}K · {{diff}}",
+    "allTimeRecord": "{{wins}} menang dari {{matches}} main · {{rate}}%",
+    "allTimeTitle": "Peringkat {{sport}}",
+    "allTimeMeta": "{{players}} pemain",
+    "meta": "{{rounds}} ronde · {{players}} pemain",
+    "tierUpHeadline": "Naik tier",
+    "tierUpCounter": "{{n}} dari {{total}}",
+    "tierUpFor": "{{name}} naik tier",
+    "captions": {
+      "podium": "Podium",
+      "rpUnit": "RP",
+      "madeWith": "dicatat dengan FRDUP"
+    },
+    "empty": {
+      "title": "Belum ada peringkat",
+      "body": "Peringkat muncul setelah ada sesi selesai untuk olahraga ini."
+    }
+  },
+  "settings": {
+    "profile": "Profil",
+    "roundingHint": "Dipakai untuk membulatkan jumlah yang harus ditransfer tiap orang.",
+    "sportsNone": "Olahraga ini tidak punya pengaturan tambahan.",
+    "payment": {
+      "bankPlaceholder": "mis. BCA",
+      "noteHint": "Tampil di bawah info transfer.",
+      "qrisUpload": "Unggah gambar QRIS",
+      "qrisReplace": "Ganti",
+      "qrisAlt": "Gambar QRIS",
+      "qrisSaved": "QRIS tersimpan.",
+      "qrisTooLarge": "Gambarnya terlalu besar. Coba potong bagian QR-nya saja.",
+      "qrisFailed": "Gambar tidak bisa dibaca. Coba file lain."
+    },
+    "data": {
+      "exportDone": "Cadangan diunduh.",
+      "exportShared": "Cadangan dibagikan.",
+      "exportFailed": "Cadangan gagal dibuat. Coba lagi.",
+      "lastBackup": "Cadangan terakhir: {{date}}",
+      "neverBackedUp": "Belum pernah dicadangkan",
+      "persistOk": "Penyimpanan permanen aktif. Browser tidak akan menghapus datamu otomatis.",
+      "persistWarn": "Browser masih boleh menghapus data situs ini bila ruang penuh. Pasang FRDUP ke layar utama dan simpan cadangan secara rutin.",
+      "restoreConfirm": "Pulihkan dari cadangan?",
+      "restoreDetail": "Data di file akan ditambahkan ke akun ini. Sesi dan pemain yang ada tidak dihapus.",
+      "restoreDone": "Data berhasil dipulihkan.",
+      "restoreInvalid": "File ini bukan cadangan FRDUP yang valid.",
+      "restoreFailed": "Pemulihan gagal. Coba lagi.",
+      "restoreSummary": "Dipulihkan: {{players}} pemain, {{sessions}} sesi, {{rounds}} ronde.",
+      "resetFinalTitle": "Ketik untuk melanjutkan",
+      "resetTypeLabel": "Ketik {{word}} untuk menghapus",
+      "resetWordMismatch": "Kata yang diketik belum sama.",
+      "resetDetail": "Data di perangkat ini dihapus dan kamu mendapat identitas baru. Data lama tidak bisa diakses lagi kecuali dari file cadangan. Cadangkan dulu."
+    }
+  },
+  "session": {
+    "notFound": {
+      "title": "Sesi tidak ditemukan",
+      "body": "Sesi ini tidak ada di perangkat ini."
+    },
+    "header": {
+      "title": "{{sport}} · Ronde {{round}}",
+      "meta": "{{players}} pemain · {{courts}} lapangan · {{elapsed}}",
+      "leave": "Kembali ke beranda (sesi tetap berjalan)"
+    },
+    "tabs": {
+      "label": "Bagian sesi",
+      "courts": "Lapangan",
+      "standings": "Klasemen",
+      "rounds": "Ronde",
+      "bill": "Tagihan"
+    },
+    "finishedBanner": "Sesi sudah selesai.",
+    "finishedCta": "Lihat rekap",
+    "tools": {
+      "title": "Alat sesi",
+      "courts": "Lapangan",
+      "courtsHint": "Matikan lapangan yang tidak dipakai. Berlaku mulai ronde berikutnya.",
+      "courtActive": "Pakai {{court}}",
+      "players_other": "Pemain ({{count}})",
+      "addPlayer": "Tambah",
+      "removePlayer": "Keluarkan {{name}}",
+      "playerAdded": "{{name}} ikut mulai ronde berikutnya.",
+      "playerLeft": "{{name}} keluar mulai ronde berikutnya.",
+      "leftList": "Sudah keluar: {{names}}",
+      "finish": "Selesaikan sesi",
+      "abandon": "Batalkan sesi",
+      "abandonConfirm": "Batalkan sesi ini?",
+      "abandonDetail": "Sesi dibatalkan tanpa menghitung peringkat. Skor yang sudah dicatat tidak ikut dihitung."
+    },
+    "setup": {
+      "addGuestCta": "Tambah dan pilih",
+      "guestTitle": "Pemain tamu",
+      "guestHint": "Tamu ikut main dan ikut tagihan, tapi tidak masuk peringkat.",
+      "emptyRoster": "Tambah pemain dulu, atau langsung masukkan tamu.",
+      "limitReached": "Maksimal 64 pemain dan 12 lapangan per sesi.",
+      "liveExists": "Masih ada sesi yang berjalan. Selesaikan atau batalkan dulu sebelum memulai yang baru.",
+      "detailsTitle": "Detail (opsional)",
+      "titleLabel": "Nama sesi",
+      "titlePlaceholder": "mis. Jumat malam",
+      "venueLabel": "Tempat",
+      "venuePlaceholder": "mis. GOR Sudirman",
+      "settingsTitle": "Pengaturan {{sport}}",
+      "playerCount_other": "{{count}} pemain dipilih",
+      "notEnoughPlayers": "Butuh minimal {{min}} pemain",
+      "courts": {
+        "count": "Jumlah {{noun}}",
+        "countHint": "Maksimal {{max}}",
+        "labelN": "Nama ke-{{n}}",
+        "openEnded": "Tanpa batas",
+        "targetHint": "Ronde berhenti kalau kamu menyelesaikan sesi, atau setelah target tercapai.",
+        "restNote": "Yang istirahat digilir supaya adil.",
+        "underfilled": "Pemain belum cukup untuk mengisi semua lapangan: tiap pertandingan butuh {{needed}} orang, jadi hanya {{active}} lapangan yang terpakai."
+      }
+    },
+    "court": {
+      "completedToast": "{{court}} selesai.",
+      "increase": "Tambah poin {{team}}, jadi {{value}}",
+      "decrease": "Kurangi poin {{team}}, jadi {{value}}",
+      "openPad": "Buka papan skor {{team}}, sekarang {{points}}",
+      "menu": "Menu {{court}}",
+      "menuTitle": "Pertandingan",
+      "locked": "Klaim lapangan dulu",
+      "padTotal": "Total: {{total}}",
+      "sliderLabel": "Pembagian skor",
+      "deuce": "DEUCE",
+      "ruleCap": "Target {{target}} · menang selisih 2 · maks {{cap}}",
+      "ruleNoCap": "Target {{target}} · menang selisih 2",
+      "resetScore": "Reset skor",
+      "resetToast": "Skor direset.",
+      "voidToast": "Pertandingan dibatalkan.",
+      "reshuffle": "Acak ulang",
+      "roundOfTarget": "{{n}} dari {{total}}",
+      "finishSession": "Selesaikan sesi",
+      "swapWith": "Tukar {{name}} dengan…",
+      "swapDone": "{{a}} dan {{b}} bertukar tempat.",
+      "substituteFor": "Ganti {{name}} dengan…",
+      "substituteDone": "{{inn}} menggantikan {{out}}.",
+      "lateArrivals": "Pemain lain",
+      "noOutsiders": "Tidak ada pemain lain yang bisa masuk.",
+      "status": {
+        "scheduled": "Belum mulai",
+        "inProgress": "Berjalan",
+        "completed": "Selesai",
+        "voided": "Dibatalkan"
+      },
+      "blocker": {
+        "voided": "Pertandingan ini dibatalkan.",
+        "noScore": "Isi skor dulu.",
+        "invalid": "Skornya belum valid.",
+        "notDecided": "Pertandingan belum ada pemenangnya."
+      },
+      "nextError": {
+        "unsettled": "Selesaikan dulu semua pertandingan.",
+        "insufficient_players": "Pemain aktif kurang untuk satu pertandingan.",
+        "limit": "Sudah mencapai batas 200 ronde.",
+        "no_session": "Tidak ada sesi aktif.",
+        "readonly": "Hanya host yang bisa membuat ronde baru."
+      }
+    },
+    "standings": {
+      "noDataBody": "Klasemen muncul setelah pertandingan pertama selesai.",
+      "rankFull": "Urutkan berdasarkan peringkat",
+      "playedFull": "Urutkan berdasarkan jumlah main",
+      "winsFull": "Urutkan berdasarkan menang",
+      "pointsFull": "Urutkan berdasarkan poin",
+      "diffFull": "Urutkan berdasarkan selisih",
+      "projected": "perkiraan {{delta}} RP",
+      "projectedHint": "RP di sini hanya perkiraan dan bisa berubah sampai sesi selesai."
+    },
+    "rounds": {
+      "empty": "Belum ada ronde",
+      "seed": "Seed {{seed}} · revisi {{revision}}"
+    },
+    "finish": {
+      "doneTitle": "Sesi selesai",
+      "tierUp": "Naik tier",
+      "incompleteHint": "Selesaikan atau batalkan pertandingan yang tersisa dulu.",
+      "backToCourts": "Kembali ke lapangan",
+      "readyTitle": "Siap diselesaikan",
+      "readyBody": "{{rounds}} ronde, {{players}} pemain. Peringkat (RP) akan dihitung.",
+      "cta": "Selesaikan sesi",
+      "confirmTitle": "Selesaikan sesi ini?",
+      "confirmBody": "Peringkat dihitung dan disimpan. Kamu masih bisa mengedit skor setelahnya; peringkat akan dihitung ulang.",
+      "failed": "Gagal menyelesaikan sesi. Coba lagi.",
+      "hostOnly": "Hanya host yang bisa menyelesaikan sesi.",
+      "pointsShort": "poin",
+      "noRanking": "Tidak ada peringkat",
+      "noRankingBody": "Belum ada pemain yang main cukup untuk masuk peringkat.",
+      "rpHint": "Pemain yang main kurang dari 3 pertandingan tidak mengubah peringkat.",
+      "breakdown": {
+        "placement": "Posisi akhir",
+        "winRate": "Win rate",
+        "pointDiff": "Selisih poin",
+        "participation": "Kehadiran rutin"
+      },
+      "floorProtected": "Tier ditahan: kamu tidak turun dari tier ini.",
+      "guestsNote": "Pemain tamu tidak masuk peringkat.",
+      "shareBoard": "Bagikan papan skor",
+      "editScores": "Edit skor",
+      "closeSession": "Tutup sesi",
+      "reopenTitle": "Edit skor sesi ini?",
+      "reopenBody": "Peringkat yang sudah dihitung dibatalkan dulu, lalu dihitung ulang saat kamu menyelesaikan sesi lagi."
+    }
+  },
+  "bill": {
+    "costs": "Biaya",
+    "noItemsBody": "Tambah sewa lapangan, shuttlecock, atau biaya lain.",
+    "editItem": "Edit item",
+    "itemKindLabel": "Jenis item",
+    "itemKindHint": {
+      "court_fee": "Dibagi rata ke semua peserta.",
+      "shared": "Dibagi rata ke peserta yang kamu pilih.",
+      "rental": "Dibagi ke yang tidak bawa alat sendiri.",
+      "individual": "Dibebankan ke pemain yang kamu pilih, masing-masing penuh."
+    },
+    "presets": "Pilihan cepat",
+    "itemLabel": "Nama item",
+    "itemLabelPlaceholder": "mis. Sewa lapangan",
+    "pricePerPerson": "Harga per orang",
+    "rentalQty": "Jumlah yang disewa",
+    "payerCount_other": "{{count}} orang",
+    "rentalCaption": "{{qty}} × {{price}} dibagi {{payers}} orang = {{per}}/orang",
+    "roundingLine": "Selisih pembulatan: {{amount}} (ditanggung kamu)",
+    "dueTitle": "Yang harus dibayar",
+    "transferTo": "Transfer ke",
+    "accountHolderLine": "a.n. {{name}}",
+    "qrisCaption": "Scan QRIS",
+    "shareText": "Tagihan main bareng",
+    "fixIssuesFirst": "Perbaiki item yang ditandai merah dulu.",
+    "copyText": "Salin teks",
+    "whatsapp": "WhatsApp",
+    "copyFailed": "Gagal menyalin. Salin manual dari kolom teks.",
+    "whatsappFailed": "WhatsApp tidak bisa dibuka. Coba salin teksnya.",
+    "imageSaved": "Gambar tersimpan di unduhan.",
+    "imageFailed": "Gambar gagal dibuat. Coba lagi.",
+    "hostOnly": "Tagihan dikelola host",
+    "hostOnlyBody": "Hanya host sesi yang bisa melihat dan mengubah tagihan.",
+    "error": {
+      "labelRequired": "Nama item wajib diisi",
+      "invalidAmount": "Harga harus lebih dari 0",
+      "invalidQuantity": "Jumlah minimal 1"
+    }
+  },
+  "cohost": {
+    "joinCodeSubtitle": "Bagikan ke teman supaya bisa ikut input skor",
+    "codeLabel": "Kode sesi",
+    "qrAlt": "QR untuk bergabung dengan kode {{code}}",
+    "qrHint": "Scan QR atau buka tautannya untuk langsung bergabung.",
+    "shareLink": "Bagikan tautan",
+    "copyLink": "Salin tautan",
+    "createCode": "Buat kode",
+    "noCode": "Belum ada kode aktif",
+    "noCodeBody": "Buat kode supaya perangkat lain bisa bergabung.",
+    "needsOnline": "Perlu internet untuk membuat kode dan bergabung.",
+    "issueFailed": "Kode gagal dibuat. Coba lagi.",
+    "shareText": "Gabung sesi FRDUP kami. Kode: {{code}}",
+    "noDevices": "Belum ada perangkat yang bergabung.",
+    "online": "Aktif",
+    "idle": "Tidak aktif",
+    "otherDevice": "perangkat lain",
+    "claimTitle": "Lapangan yang kamu pegang",
+    "claimHint": "Pilih lapangan yang akan kamu isi skornya.",
+    "charLabel": "Karakter {{n}} dari {{total}}",
+    "pasteFromClipboard": "Tempel dari clipboard",
+    "clipboardEmpty": "Clipboard tidak berisi kode sesi.",
+    "clipboardDenied": "Browser tidak mengizinkan membaca clipboard. Tempel manual ke kolom kode.",
+    "deviceName": "Nama perangkat",
+    "deviceNameHint": "Host melihat nama ini saat kamu bergabung.",
+    "ownSessionWarning": "Kamu sedang menjalankan sesi sendiri. Bergabung ke sesi lain akan menggantikannya di perangkat ini.",
+    "joinCta": "Gabung"
+  }
+}

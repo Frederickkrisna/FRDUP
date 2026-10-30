@@ -1,0 +1,56 @@
+{
+  "export": {
+    "sheetTitle": "Share leaderboard",
+    "tierUpSheetTitle": "Share tier-up",
+    "close": "Close",
+    "format": {
+      "label": "Format",
+      "feed": "Feed 4:5",
+      "story": "Story 9:16"
+    },
+    "template": {
+      "label": "Style",
+      "court": "Court",
+      "night": "Night",
+      "paper": "Receipt"
+    },
+    "preview": {
+      "label": "Preview",
+      "rendering": "Preparing image…"
+    },
+    "action": {
+      "share": "Share",
+      "download": "Download",
+      "save": "Save image",
+      "retry": "Try again"
+    },
+    "toast": {
+      "shared": "Image shared.",
+      "downloaded": "Image saved.",
+      "cancelled": "Cancelled.",
+      "error": "Could not create the image. Try again."
+    },
+    "error": {
+      "title": "Image failed to render",
+      "body": "Something went wrong while rendering the card."
+    },
+    "iosHint": "Direct sharing isn't available in this browser. Long-press the preview to save the image, or tap Download.",
+    "shareText": "{{title}} · {{sport}} — made with {{brand}}",
+    "card": {
+      "rank": "#",
+      "podium": "Podium",
+      "morePlayers_one": "+{{count}} more player",
+      "morePlayers_other": "+{{count}} more players",
+      "allTime": "All-time",
+      "session": "Session",
+      "rpUnit": "RP",
+      "player": "players",
+      "empty": "No players yet"
+    },
+    "tierUp": {
+      "from": "From",
+      "to": "To",
+      "promoted": "Promoted"
+    }
+  }
+}

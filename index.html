@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, viewport-fit=cover, interactive-widget=resizes-content"
+    />
+    <meta name="theme-color" content="#0A0E13" />
+    <meta name="color-scheme" content="dark" />
+    <meta name="description" content="FRDUP: skor live, acak lawan adil, leaderboard siap post, dan split bill untuk main bareng." />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-title" content="FRDUP" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="format-detection" content="telephone=no" />
+    <link rel="icon" href="/favicon.ico" sizes="48x48" />
+    <link rel="icon" href="/icon.svg" sizes="any" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon-180x180.png" />
+    <title>FRDUP</title>
+  </head>
+  <body>
+    <div id="root">
+      <!-- Static splash: paints before any JS runs; React replaces it on mount. -->
+      <main style="display: flex; min-height: 100dvh; align-items: center; justify-content: center">
+        <svg viewBox="0 0 64 64" width="64" height="64" aria-hidden="true">
+          <rect x="14" y="8" width="36" height="48" fill="none" stroke="#B8FF3C" stroke-width="3" />
+          <line x1="10" y1="32" x2="54" y2="32" stroke="#B8FF3C" stroke-width="4" />
+          <line x1="14" y1="20" x2="50" y2="20" stroke="#B8FF3C" stroke-width="2" />
+          <line x1="14" y1="44" x2="50" y2="44" stroke="#B8FF3C" stroke-width="2" />
+          <circle cx="42" cy="14" r="3.5" fill="#B8FF3C" />
+        </svg>
+        <p class="sr-only" role="status">FRDUP</p>
+      </main>
+    </div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>

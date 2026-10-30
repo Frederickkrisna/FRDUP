@@ -1,0 +1,110 @@
+/*
+ * Export module styles. Hex literals are allowed here (this is the styles edge for this feature).
+ * These variables extend the design tokens with a few template-specific colours the share cards
+ * need (court-line ink, receipt paper, night ground). Everything else reuses src/styles/tokens.css.
+ *
+ * All share cards avoid backdrop-filter, mix-blend-mode and foreignObject so Android Chrome and
+ * iOS Safari rasterise them identically via html-to-image.
+ */
+
+.frdup-export-card {
+  /* court — the brand look: near-black ground, electric-lime court lines, scoreboard numerals */
+  --xc-court-bg: #070b0f;
+  --xc-court-ground: #0b1218;
+  --xc-court-line: #b8ff3c;
+  --xc-court-line-dim: #3f5a1d;
+  --xc-court-ink: #eaf1f8;
+  --xc-court-ink-muted: #8aa0b2;
+  --xc-court-ink-faint: #566879;
+  --xc-court-panel: #101922;
+
+  /* night — deep, high-contrast, tier-colour driven; glow is layered solid shapes, no blur */
+  --xc-night-bg: #05070c;
+  --xc-night-ground: #0a0f1a;
+  --xc-night-panel: #121a2a;
+  --xc-night-ink: #f2f6fb;
+  --xc-night-ink-muted: #94a3bd;
+  --xc-night-ink-faint: #566178;
+  --xc-night-hair: #1d2740;
+
+  /* paper — warm off-white receipt, ink-black type, one lime-green accent */
+  --xc-paper-bg: #f4efe3;
+  --xc-paper-card: #fbf8f0;
+  --xc-paper-ink: #16130c;
+  --xc-paper-ink-muted: #6b6454;
+  --xc-paper-ink-faint: #a49d8a;
+  --xc-paper-line: #ddd5c2;
+  --xc-paper-accent: #2f7d0f;
+
+  position: relative;
+  overflow: hidden;
+  font-family: var(--font-sans);
+  box-sizing: border-box;
+}
+
+.frdup-export-card *,
+.frdup-export-card *::before,
+.frdup-export-card *::after {
+  box-sizing: border-box;
+}
+
+/* Tabular monospaced figures for every data numeral on the cards. */
+.frdup-export-num {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: 'tnum' 1;
+  letter-spacing: -0.01em;
+}
+
+/*
+ * Off-screen render stage. Fixed-size, visually hidden but fully laid out and painted (NOT
+ * display:none, which would give html-to-image nothing to measure). Pinned top-left, away from
+ * the viewport, independent of scroll.
+ */
+.frdup-export-stage {
+  position: fixed;
+  top: 0;
+  left: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  z-index: -1;
+  opacity: 0;
+  pointer-events: none;
+  transform: translateX(-200vw);
+  contain: layout size style;
+}
+
+/*
+ * Court-line decoration drawn with layered solid gradients (hard stops = crisp lines, no blur).
+ * Rendered as a background so html-to-image captures it as paint, not as a separate element.
+ */
+.frdup-court-lines {
+  position: absolute;
+  inset: 0;
+  background-color: var(--xc-court-ground);
+  background-image:
+    linear-gradient(to right, var(--xc-court-line-dim) 0 2px, transparent 2px 100%),
+    linear-gradient(to left, var(--xc-court-line-dim) 0 2px, transparent 2px 100%),
+    linear-gradient(to bottom, var(--xc-court-line-dim) 0 2px, transparent 2px 100%);
+  background-repeat: no-repeat;
+  background-position:
+    64px 0,
+    calc(100% - 64px) 0,
+    0 50%;
+}
+
+/* Night glow: a single large radial of solid colour at low opacity (no filter/blur). */
+.frdup-night-glow {
+  position: absolute;
+  border-radius: 999px;
+  opacity: 0.5;
+}
+
+/* Receipt perforation: a repeating scalloped edge built from a radial gradient (crisp, blur-free). */
+.frdup-paper-perf {
+  height: 16px;
+  background:
+    radial-gradient(circle at 10px -4px, transparent 12px, var(--xc-paper-card) 12px) repeat-x;
+  background-size: 20px 16px;
+}

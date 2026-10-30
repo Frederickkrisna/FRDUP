@@ -1,0 +1,61 @@
+{
+  "analytics": {
+    "section": {
+      "label": "Statistik pemain"
+    },
+    "stat": {
+      "matches": "Pertandingan",
+      "winRate": "Menang %",
+      "sessions": "Sesi",
+      "peakRp": "RP tertinggi"
+    },
+    "window": {
+      "label": "Rentang sesi",
+      "lastN": "{{count}} terakhir"
+    },
+    "table": {
+      "date": "Tanggal"
+    },
+    "trend": {
+      "up": "Lagi naik.",
+      "down": "Lagi turun.",
+      "flat": "Stabil."
+    },
+    "winRate": {
+      "title": "Win rate",
+      "session": "Win rate sesi",
+      "cumulative": "Win rate kumulatif",
+      "summaryLatest": "Win rate terakhir",
+      "tableCaption": "Win rate per sesi dan kumulatif"
+    },
+    "points": {
+      "title": "Poin per pertandingan",
+      "perMatchFor": "Poin dapat",
+      "perMatchAgainst": "Poin kebobolan",
+      "summaryLatest": "Poin per pertandingan terakhir",
+      "tableCaption": "Rata-rata poin dapat dan kebobolan per pertandingan",
+      "net": {
+        "positive": "Lebih banyak cetak poin.",
+        "negative": "Lebih banyak kebobolan."
+      }
+    },
+    "rp": {
+      "title": "Riwayat RP",
+      "value": "RP",
+      "delta": "Perubahan",
+      "tier": "Tier",
+      "reason": "Catatan",
+      "reverted": "Sesi dibatalkan",
+      "summaryLatest": "RP terakhir",
+      "tableCaption": "Riwayat rank point per sesi"
+    },
+    "empty": {
+      "title": "Belum ada grafik",
+      "body": "Main 3 sesi dulu ya biar grafiknya kelihatan.",
+      "noData": "Belum ada data."
+    },
+    "error": {
+      "body": "Gagal memuat statistik."
+    }
+  }
+}

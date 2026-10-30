@@ -1,0 +1,55 @@
+{
+  "export": {
+    "sheetTitle": "Bagikan papan skor",
+    "tierUpSheetTitle": "Bagikan kenaikan tier",
+    "close": "Tutup",
+    "format": {
+      "label": "Format",
+      "feed": "Feed 4:5",
+      "story": "Story 9:16"
+    },
+    "template": {
+      "label": "Gaya",
+      "court": "Court",
+      "night": "Malam",
+      "paper": "Struk"
+    },
+    "preview": {
+      "label": "Pratinjau",
+      "rendering": "Menyiapkan gambar…"
+    },
+    "action": {
+      "share": "Bagikan",
+      "download": "Unduh",
+      "save": "Simpan gambar",
+      "retry": "Coba lagi"
+    },
+    "toast": {
+      "shared": "Gambar dibagikan.",
+      "downloaded": "Gambar tersimpan.",
+      "cancelled": "Dibatalkan.",
+      "error": "Gagal membuat gambar. Coba lagi."
+    },
+    "error": {
+      "title": "Gambar gagal dibuat",
+      "body": "Ada yang tidak beres saat merender kartu."
+    },
+    "iosHint": "Berbagi langsung tidak tersedia di peramban ini. Tekan lama pratinjau untuk menyimpan gambar, atau ketuk Unduh.",
+    "shareText": "{{title}} · {{sport}} — dibuat dengan {{brand}}",
+    "card": {
+      "rank": "#",
+      "podium": "Podium",
+      "morePlayers_other": "+{{count}} pemain lagi",
+      "allTime": "Sepanjang masa",
+      "session": "Sesi",
+      "rpUnit": "RP",
+      "player": "pemain",
+      "empty": "Belum ada pemain"
+    },
+    "tierUp": {
+      "from": "Dari",
+      "to": "Ke",
+      "promoted": "Naik tier"
+    }
+  }
+}

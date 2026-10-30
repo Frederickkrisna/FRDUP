@@ -1,0 +1,61 @@
+{
+  "analytics": {
+    "section": {
+      "label": "Player stats"
+    },
+    "stat": {
+      "matches": "Matches",
+      "winRate": "Win %",
+      "sessions": "Sessions",
+      "peakRp": "Peak RP"
+    },
+    "window": {
+      "label": "Session range",
+      "lastN": "Last {{count}}"
+    },
+    "table": {
+      "date": "Date"
+    },
+    "trend": {
+      "up": "Trending up.",
+      "down": "Trending down.",
+      "flat": "Steady."
+    },
+    "winRate": {
+      "title": "Win rate",
+      "session": "Session win rate",
+      "cumulative": "Cumulative win rate",
+      "summaryLatest": "Latest win rate",
+      "tableCaption": "Win rate per session and cumulative"
+    },
+    "points": {
+      "title": "Points per match",
+      "perMatchFor": "Points for",
+      "perMatchAgainst": "Points against",
+      "summaryLatest": "Latest points per match",
+      "tableCaption": "Average points for and against per match",
+      "net": {
+        "positive": "Scoring more than conceding.",
+        "negative": "Conceding more than scoring."
+      }
+    },
+    "rp": {
+      "title": "RP history",
+      "value": "RP",
+      "delta": "Change",
+      "tier": "Tier",
+      "reason": "Note",
+      "reverted": "Session reverted",
+      "summaryLatest": "Latest RP",
+      "tableCaption": "Rank point history per session"
+    },
+    "empty": {
+      "title": "No charts yet",
+      "body": "Play 3 sessions first so the charts have something to show.",
+      "noData": "No data yet."
+    },
+    "error": {
+      "body": "Couldn't load stats."
+    }
+  }
+}

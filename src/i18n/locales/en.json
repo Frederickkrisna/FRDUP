@@ -1,0 +1,373 @@
+{
+  "common": {
+    "appName": "FRDUP",
+    "loading": "Loading…",
+    "retry": "Retry",
+    "cancel": "Cancel",
+    "save": "Save",
+    "delete": "Delete",
+    "confirm": "Confirm",
+    "back": "Back",
+    "done": "Done",
+    "next": "Next",
+    "skip": "Skip",
+    "edit": "Edit",
+    "add": "Add",
+    "remove": "Remove",
+    "restore": "Restore",
+    "archive": "Archive",
+    "search": "Search",
+    "close": "Close",
+    "share": "Share",
+    "copy": "Copy",
+    "copied": "Copied!",
+    "yes": "Yes",
+    "no": "No",
+    "or": "or",
+    "allSports": "All Sports",
+    "version": "Version"
+  },
+  "onboarding": {
+    "step1": {
+      "title": "What should we call you?",
+      "placeholder": "Your name",
+      "cta": "Get Started"
+    },
+    "step2": {
+      "title": "Favourite sport?",
+      "subtitle": "You can change this later",
+      "cta": "Continue"
+    },
+    "step3": {
+      "title": "Add players",
+      "subtitle": "Paste names from WhatsApp — one name per line",
+      "bulkPlaceholder": "Player names, one per line…",
+      "singlePlaceholder": "Player name",
+      "cta": "Start Playing",
+      "skip": "Skip, add later"
+    }
+  },
+  "roster": {
+    "title": "Players",
+    "empty": {
+      "title": "No players yet",
+      "subtitle": "Add players to start a session"
+    },
+    "addPlayer": "Add Player",
+    "searchPlaceholder": "Search names…",
+    "archived": "Archived",
+    "showArchived": "Show archived",
+    "hideArchived": "Hide archived",
+    "sortBy": "Sort by",
+    "sortName": "Name",
+    "sortLastPlayed": "Last played",
+    "sortTier": "Tier",
+    "newPlayer": {
+      "title": "New Player",
+      "nameLabel": "Name",
+      "namePlaceholder": "Full name",
+      "nicknameLabel": "Nickname (optional)",
+      "nicknamePlaceholder": "Short name",
+      "phoneLabel": "WhatsApp number (optional)",
+      "phonePlaceholder": "+62xxx",
+      "guest": "Guest player (not ranked)",
+      "cta": "Save"
+    },
+    "editPlayer": {
+      "title": "Edit Player",
+      "archiveConfirm": "Archive {{name}}?",
+      "archiveDetail": "The player won't appear in the roster, but history is preserved.",
+      "deleteConfirm": "Permanently delete {{name}}?",
+      "deleteDetail": "All history and stats will be deleted. This cannot be undone.",
+      "cta": "Save Changes"
+    },
+    "stats": {
+      "title": "Stats",
+      "matchesPlayed": "Matches",
+      "wins": "Wins",
+      "winRate": "Win Rate",
+      "pointsFor": "Points For",
+      "pointsAgainst": "Points Against",
+      "sessionsPlayed": "Sessions",
+      "noData": "No data for this sport yet"
+    }
+  },
+  "session": {
+    "setup": {
+      "title": "New Session",
+      "stepSport": "Sport & Players",
+      "stepCourts": "Courts",
+      "stepFormat": "Format",
+      "selectSport": "Select Sport",
+      "selectPlayers": "Select Players",
+      "selectAll": "Select all",
+      "deselectAll": "Deselect all",
+      "addGuest": "+ Guest",
+      "playerCount_one": "{{count}} player selected",
+      "playerCount_other": "{{count}} players selected",
+      "notEnoughPlayers": "Need at least {{min}} players",
+      "courts": {
+        "title": "Court Settings",
+        "count": "Number of Courts",
+        "label": "Label",
+        "targetRounds": "Target Rounds",
+        "duration": "Duration",
+        "fairnessPreview": "{{players}} players, {{courts}} courts → {{playing}} playing, {{resting}} resting each round"
+      },
+      "format": {
+        "title": "Game Format",
+        "americano": "Americano",
+        "mexicano": "Mexicano",
+        "team_fixed": "Fixed Teams",
+        "free": "Free",
+        "americanoDesc": "Rotating partners, individual scoring",
+        "mexicanoDesc": "Pairings based on standings",
+        "teamFixedDesc": "Same teams all session",
+        "freeDesc": "Host arranges manually"
+      },
+      "cta": "Start Session"
+    },
+    "court": {
+      "title": "Courts",
+      "ronde": "Round {{number}}",
+      "nextRound": "Next Round",
+      "nextRoundConfirm": "Start round {{number}}?",
+      "allMatchesMustComplete": "All matches must be completed first",
+      "resting": "Resting",
+      "noResting": "All players active",
+      "vsLabel": "vs",
+      "startMatch": "Start",
+      "completeMatch": "Complete",
+      "reopenMatch": "Reopen",
+      "voidMatch": "Void",
+      "editScore": "Edit Score",
+      "swapPlayers": "Swap Players",
+      "substitute": "Substitute Player",
+      "claimCourt": "Claim Court",
+      "courtClaimed": "Claimed",
+      "scoreUpdatedByCohost": "Court {{court}} score updated by {{device}}"
+    },
+    "standings": {
+      "title": "Standings",
+      "rank": "#",
+      "player": "Player",
+      "played": "P",
+      "wins": "W",
+      "losses": "L",
+      "points": "Pts",
+      "diff": "+/-",
+      "winRate": "WR",
+      "noData": "No completed matches yet"
+    },
+    "rounds": {
+      "title": "Rounds",
+      "round": "Round {{number}}",
+      "completed": "Completed",
+      "inProgress": "In Progress",
+      "scheduled": "Scheduled",
+      "editScoreNotice": "Standings and upcoming rounds will update.",
+      "regenerate": "Regenerate Round",
+      "seed": "Seed: {{seed}} · Cost: {{cost}}"
+    },
+    "finish": {
+      "title": "Finish Session",
+      "incompleteMatches": "{{count}} matches incomplete",
+      "voidRemaining": "Void remaining matches",
+      "podium": "Podium",
+      "rpDelta": "RP Changes",
+      "gained": "+{{rp}} RP",
+      "lost": "{{rp}} RP",
+      "noChange": "No change",
+      "tierUp": "Tier Up! 🎉",
+      "skipAll": "Skip all",
+      "continueToBill": "Continue to Bill",
+      "sessionAlreadyCommitted": "This session has already been committed"
+    }
+  },
+  "bill": {
+    "title": "Bill",
+    "addItem": "Add Item",
+    "noItems": "No bill items yet",
+    "itemKind": {
+      "court_fee": "Court Fee",
+      "shared": "Shared",
+      "rental": "Rental",
+      "individual": "Individual"
+    },
+    "preset": {
+      "courtRental": "Court Rental",
+      "shuttlecock": "Shuttlecock",
+      "racketRental": "Racket Rental",
+      "parking": "Parking",
+      "water": "Water",
+      "balls": "Balls"
+    },
+    "quantity": "Quantity",
+    "unitPrice": "Unit Price",
+    "total": "Total",
+    "payers": "Paid by",
+    "allParticipants": "All participants",
+    "broughtOwn": "Brought own",
+    "broughtOwnHint": "Check players who brought their own equipment — they won't be charged for rentals",
+    "subtotal": "Subtotal",
+    "roundingLine": "Rounding (absorbed by host): {{amount}}",
+    "settlements": "Payment Breakdown",
+    "export": "Export",
+    "copyWhatsapp": "Copy for WhatsApp",
+    "shareWhatsapp": "Send via WhatsApp",
+    "exportImage": "Save as Image",
+    "rounding": {
+      "title": "Rounding",
+      "100": "To nearest Rp 100",
+      "500": "To nearest Rp 500",
+      "1000": "To nearest Rp 1,000"
+    },
+    "error": {
+      "noPayers": "Select at least 1 player for this item"
+    }
+  },
+  "rank": {
+    "tier": {
+      "warrior": "Warrior",
+      "elite": "Elite",
+      "master": "Master",
+      "grandmaster": "Grandmaster",
+      "epic": "Epic",
+      "legend": "Legend",
+      "mythic": "Mythic"
+    },
+    "division": "Division {{number}}",
+    "stars": "{{count}} stars",
+    "mythicPoints": "{{points}} points",
+    "rpToNextStar": "{{rp}} RP to next star"
+  },
+  "sport": {
+    "padel": {
+      "name": "Padel",
+      "court": "Court",
+      "settings": {
+        "fixedTotal": "Points per Game",
+        "fixedTotalOption16": "16 points",
+        "fixedTotalOption21": "21 points",
+        "fixedTotalOption24": "24 points",
+        "fixedTotalOption32": "32 points"
+      }
+    },
+    "badminton": {
+      "name": "Badminton",
+      "court": "Court",
+      "settings": {
+        "targetScore": "Target Score",
+        "singleMode": "Singles Mode (1v1)"
+      }
+    },
+    "pingpong": {
+      "name": "Table Tennis",
+      "court": "Table",
+      "settings": {
+        "targetScore": "Target Score",
+        "target11": "11 points",
+        "target15": "15 points",
+        "target21": "21 points",
+        "doublesMode": "Doubles Mode (2v2)"
+      }
+    },
+    "billiard": {
+      "name": "Billiard",
+      "court": "Table",
+      "settings": {
+        "doublesMode": "Doubles Mode (2v2)"
+      }
+    },
+    "mahjong": {
+      "name": "Mahjong",
+      "court": "Table",
+      "settings": {}
+    }
+  },
+  "error": {
+    "generic": "Something went wrong. Please try again.",
+    "offline": "No internet connection.",
+    "sessionNotFound": "Session not found.",
+    "joinCodeInvalid": "Invalid code.",
+    "joinCodeExpired": "Code has expired.",
+    "score": {
+      "negative": "Score cannot be negative",
+      "fixedSumMismatch": "Scores must add up to {{total}}",
+      "exceedsCap": "Score cannot exceed {{cap}}",
+      "exceedsTarget": "Score cannot exceed {{target}}",
+      "matchAlreadyDecided": "Match is already decided"
+    }
+  },
+  "settings": {
+    "title": "Settings",
+    "hostName": "Host Name",
+    "language": "Language",
+    "languageId": "Indonesian",
+    "languageEn": "English",
+    "rounding": "Bill Rounding",
+    "payment": {
+      "title": "Payment Info",
+      "bank": "Bank",
+      "accountNumber": "Account Number",
+      "accountHolder": "Account Name",
+      "qris": "Upload QRIS",
+      "note": "Note"
+    },
+    "sports": "Sport Settings",
+    "data": {
+      "title": "Data",
+      "export": "Export Backup",
+      "restore": "Restore from Backup",
+      "syncStatus": "Sync Status",
+      "pendingWrites": "{{count}} changes pending sync",
+      "resetApp": "Reset App",
+      "resetConfirm": "Delete all data?",
+      "resetDetail": "All data, stats, and sessions will be permanently deleted. THIS CANNOT BE UNDONE."
+    }
+  },
+  "home": {
+    "title": "Home",
+    "resumeBanner": {
+      "title": "Session in progress",
+      "cta": "Resume"
+    },
+    "newSession": "Start Session",
+    "recentSessions": "Recent Sessions",
+    "noSessions": "No sessions yet. Let's play!",
+    "highlights": {
+      "topWinner": "Most wins this month",
+      "newTier": "Latest tier-up",
+      "totalSessions": "Sessions this month"
+    }
+  },
+  "history": {
+    "title": "History",
+    "empty": "No completed sessions",
+    "filterBySport": "Filter by sport",
+    "recap": {
+      "title": "Session Recap",
+      "players": "Players",
+      "rounds": "Rounds",
+      "duration": "Duration",
+      "viewBill": "View Bill"
+    }
+  },
+  "sync": {
+    "idle": "Synced",
+    "syncing": "Syncing…",
+    "offline": "Offline",
+    "error": "Sync failed"
+  },
+  "cohost": {
+    "joinCode": "Join Code",
+    "joinCodeExpiry": "Valid for {{duration}}",
+    "renewCode": "Renew Code",
+    "disableCode": "Disable Code",
+    "connectedDevices": "Connected Devices",
+    "joinTitle": "Join Session",
+    "joinSubtitle": "Enter the 6-character code from the host",
+    "joining": "Connecting…",
+    "joined": "Joined successfully!"
+  }
+}
