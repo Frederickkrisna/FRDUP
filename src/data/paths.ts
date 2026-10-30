@@ -29,4 +29,5 @@ export const paths = {
     doc(getDb(), 'sessions', sessionId, 'cohosts', uid),
   bill: (sessionId: string): DocumentReference => doc(getDb(), 'sessions', sessionId, 'bill', 'bill'),
   code: (code: string): DocumentReference => doc(getDb(), 'session_codes', code),
+  publicBoard: (boardId: string): DocumentReference => doc(getDb(), 'public_boards', boardId),
 };

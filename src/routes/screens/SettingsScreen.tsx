@@ -9,7 +9,7 @@ import { TextField } from '@/components/TextField';
 import { Chip } from '@/components/Chip';
 import { i18n } from '@/i18n';
 import { hostRepo } from '@/data/hostRosterRepo';
-import { signOutDevice } from '@/data/firebase';
+import { signOutDevice } from '@/data/authRepo';
 import { DataSection } from '@/features/settings/DataSection';
 import { PaymentSection } from '@/features/settings/PaymentSection';
 import { SportSettingsForm } from '@/features/settings/SportSettingsForm';
@@ -73,11 +73,11 @@ export function SettingsScreen() {
         />
       </Section>
 
-      <Section title="Akun">
+      <Section title={t('settings.account')}>
         <div className="flex items-center justify-between">
           <div>
             <p className="text-[15px] font-semibold">{host.displayName || 'Fred'}</p>
-            <p className="text-[13px] text-ink-muted">Akun bersama (fred@frdup.app)</p>
+            <p className="text-[13px] text-ink-muted">{t('settings.accountSubtitle')}</p>
           </div>
           <Button
             variant="secondary"
@@ -88,7 +88,7 @@ export function SettingsScreen() {
               void navigate('/onboarding', { replace: true });
             }}
           >
-            Keluar
+            {t('settings.signOut')}
           </Button>
         </div>
       </Section>

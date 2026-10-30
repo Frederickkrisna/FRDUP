@@ -85,7 +85,7 @@ export function SetupCourtsStep({ plugin, playerCount, shape }: Props) {
             <h2 id="target-rounds" className="text-[17px] font-bold">
               {t('session.setup.courts.targetRounds')}
             </h2>
-            <p className="text-[13px] text-ink-muted">Pilih durasi sewa lapangan atau tentukan jumlah ronde</p>
+            <p className="text-[13px] text-ink-muted">{t('session.setup.courts.targetRoundsHint')}</p>
           </div>
           <Chip selected={targetRounds === null} onClick={() => patch({ targetRounds: targetRounds === null ? 8 : null })}>
             {t('session.setup.courts.openEnded')}
@@ -94,18 +94,18 @@ export function SetupCourtsStep({ plugin, playerCount, shape }: Props) {
 
         <div className="flex flex-wrap gap-2">
           {[
-            { label: '1 Jam', rounds: 4 },
-            { label: '1.5 Jam', rounds: 6 },
-            { label: '2 Jam', rounds: 8 },
-            { label: '2.5 Jam', rounds: 10 },
-            { label: '3 Jam', rounds: 12 },
+            { key: 'session.setup.courts.preset1h', rounds: 4 },
+            { key: 'session.setup.courts.preset1h5', rounds: 6 },
+            { key: 'session.setup.courts.preset2h', rounds: 8 },
+            { key: 'session.setup.courts.preset2h5', rounds: 10 },
+            { key: 'session.setup.courts.preset3h', rounds: 12 },
           ].map((preset) => (
             <Chip
-              key={preset.label}
+              key={preset.rounds}
               selected={targetRounds === preset.rounds}
               onClick={() => patch({ targetRounds: preset.rounds })}
             >
-              {preset.label} (~{preset.rounds} ronde)
+              {`${t(preset.key)} (${t('session.setup.courts.presetRounds', { n: preset.rounds })})`}
             </Chip>
           ))}
         </div>
@@ -113,8 +113,8 @@ export function SetupCourtsStep({ plugin, playerCount, shape }: Props) {
         {targetRounds !== null ? (
           <div className="mt-1 flex items-center justify-between gap-4 rounded-md border border-line bg-surface-2 p-3">
             <div>
-              <p className="text-[14px] font-semibold">{targetRounds} Ronde</p>
-              <p className="text-[12px] text-ink-muted">Estimasi ~{targetRounds * 15} menit (bisa diakhiri kapan saja)</p>
+              <p className="text-[14px] font-semibold">{t('session.setup.courts.customRounds', { n: targetRounds })}</p>
+              <p className="text-[12px] text-ink-muted">{t('session.setup.courts.customEstimate', { min: targetRounds * 15 })}</p>
             </div>
             <Stepper
               value={targetRounds}
@@ -128,7 +128,7 @@ export function SetupCourtsStep({ plugin, playerCount, shape }: Props) {
           </div>
         ) : (
           <p className="rounded-md border border-line bg-surface-2 p-3 text-[13px] text-ink-muted">
-            Mode tanpa batas: Main sebanyak ronde yang diinginkan, lalu akhiri sesi kapan saja.
+            {t('session.setup.courts.openEndedNote')}
           </p>
         )}
       </section>

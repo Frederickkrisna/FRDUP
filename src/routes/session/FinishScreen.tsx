@@ -192,7 +192,7 @@ export function FinishScreen() {
                           <p className="truncate text-[16px] font-semibold leading-tight">{p ? displayName(p) : '?'}</p>
                           {sRow ? (
                             <p className="num text-[12px] text-ink-muted">
-                              {sRow.pointsFor} Poin · {sRow.wins}M-{sRow.losses}K
+                              {t('session.finish.playerStats', { points: sRow.pointsFor, wins: sRow.wins, losses: sRow.losses })}
                             </p>
                           ) : null}
                         </div>

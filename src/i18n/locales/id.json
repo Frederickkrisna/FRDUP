@@ -31,7 +31,13 @@
     "step1": {
       "title": "Panggil kamu siapa?",
       "placeholder": "Nama kamu",
-      "cta": "Mulai"
+      "cta": "Mulai",
+      "loginTitle": "Masuk Akun",
+      "loginSubtitle": "Gunakan akun Fred untuk berbagi progres dan sinkronisasi data antar perangkat.",
+      "usernameLabel": "Username",
+      "passwordLabel": "Password",
+      "loginCta": "Masuk & Lanjutkan",
+      "loginFailed": "Login gagal, periksa username & password"
     },
     "step2": {
       "title": "Olahraga favorit?",
@@ -71,7 +77,13 @@
       "phoneLabel": "Nomor WhatsApp (opsional)",
       "phonePlaceholder": "08xxx",
       "guest": "Pemain tamu (tidak masuk ranking)",
+      "uploadPhoto": "Upload Foto",
+      "removePhoto": "Hapus",
       "cta": "Simpan"
+    },
+    "form": {
+      "uploadPhoto": "Upload Foto",
+      "removePhoto": "Hapus"
     },
     "editPlayer": {
       "title": "Edit Pemain",
@@ -111,8 +123,23 @@
         "count": "Jumlah Lapangan",
         "label": "Label",
         "targetRounds": "Target Ronde",
+        "targetRoundsHint": "Pilih durasi sewa lapangan atau tentukan jumlah ronde",
         "duration": "Durasi",
-        "fairnessPreview": "{{players}} pemain, {{courts}} lapangan → {{playing}} main, {{resting}} istirahat tiap ronde"
+        "openEnded": "Tanpa Batas",
+        "fairnessPreview": "{{players}} pemain, {{courts}} lapangan → {{playing}} main, {{resting}} istirahat tiap ronde",
+        "countHint": "Maks {{max}} lapangan",
+        "labelN": "Label {{n}}",
+        "underfilled": "Butuh min {{needed}} pemain per lapangan — hanya {{active}} lapangan aktif",
+        "restNote": "Pemain istirahat dirotasi setiap ronde",
+        "preset1h": "1 Jam",
+        "preset1h5": "1.5 Jam",
+        "preset2h": "2 Jam",
+        "preset2h5": "2.5 Jam",
+        "preset3h": "3 Jam",
+        "presetRounds": "~{{n}} ronde",
+        "customRounds": "{{n}} Ronde",
+        "customEstimate": "Estimasi ~{{min}} menit (bisa diakhiri kapan saja)",
+        "openEndedNote": "Mode tanpa batas: Main sebanyak ronde yang diinginkan, lalu akhiri sesi kapan saja."
       },
       "format": {
         "title": "Format Permainan",
@@ -145,7 +172,12 @@
       "substitute": "Ganti Pemain",
       "claimCourt": "Klaim Lapangan",
       "courtClaimed": "Diklaim",
-      "scoreUpdatedByCohost": "Skor lapangan {{court}} diperbarui oleh {{device}}"
+      "scoreUpdatedByCohost": "Skor lapangan {{court}} diperbarui oleh {{device}}",
+      "reshuffle": "Acak Ulang",
+      "finishSession": "Selesai Sesi",
+      "standings": "Klasemen",
+      "finish": "Selesai",
+      "finishTitle": "Akhiri sesi sekarang & lihat hasil akhir"
     },
     "standings": {
       "title": "Klasemen",
@@ -181,7 +213,8 @@
       "tierUp": "Naik Tier! 🎉",
       "skipAll": "Lewati semua",
       "continueToBill": "Lanjut ke Tagihan",
-      "sessionAlreadyCommitted": "Sesi ini sudah diselesaikan"
+      "sessionAlreadyCommitted": "Sesi ini sudah diselesaikan",
+      "playerStats": "{{points}} Poin · {{wins}}M-{{losses}}K"
     }
   },
   "bill": {
@@ -302,6 +335,10 @@
   "settings": {
     "title": "Pengaturan",
     "hostName": "Nama Host",
+    "profile": "Profil",
+    "account": "Akun",
+    "accountSubtitle": "Akun bersama (fred@frdup.app)",
+    "signOut": "Keluar",
     "language": "Bahasa",
     "languageId": "Indonesia",
     "languageEn": "English",
@@ -352,6 +389,15 @@
       "duration": "Durasi",
       "viewBill": "Lihat Tagihan"
     }
+  },
+  "board": {
+    "title": "Klasemen Keseluruhan",
+    "empty": {
+      "title": "Belum ada pemain di ranking",
+      "body": "Selesaikan sesi pertandingan untuk mulai mencatat ranking dan performa pemain."
+    },
+    "rankLabel": "Peringkat {{rank}}",
+    "stats": "W-L-T: {{wins}}-{{losses}}-0 · WR: {{winRate}}% · {{matches}}M"
   },
   "sync": {
     "idle": "Tersinkron",

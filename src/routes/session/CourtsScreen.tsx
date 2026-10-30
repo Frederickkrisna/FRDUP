@@ -110,7 +110,7 @@ export function CourtsScreen() {
             </Button>
           ) : null}
           <Button size="sm" variant="secondary" onClick={() => void navigate(`/session/${session.id}/standings`)}>
-            Klasemen
+            {t('session.court.standings')}
           </Button>
         </div>
       </div>
@@ -139,9 +139,9 @@ export function CourtsScreen() {
                 variant="secondary"
                 leftIcon={<Flag size={18} aria-hidden="true" />}
                 onClick={() => void navigate(`/session/${session.id}/finish`)}
-                title="Akhiri sesi sekarang & lihat hasil akhir"
+                title={t('session.court.finishTitle')}
               >
-                Selesai
+                {t('session.court.finish')}
               </Button>
             </div>
           )}

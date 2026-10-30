@@ -61,4 +61,40 @@ describe('Firestore wire conversion', () => {
   it('drops undefined values (Firestore rejects them)', () => {
     expect(encode({ a: 1, b: undefined })).toEqual({ a: 1 });
   });
+
+  it('converts PublicBoardDoc timestamps and nested entries properly', () => {
+    const board = {
+      id: 'b1',
+      hostId: 'h1',
+      sessionId: 's1',
+      sportId: 'badminton',
+      title: 'Friday Night Padel',
+      venue: 'Kemang',
+      playedAt: 1_700_000_000_000,
+      entries: [
+        {
+          playerId: 'p1',
+          name: 'Fred',
+          nickname: null,
+          avatarColor: '#10b981',
+          rank: 1,
+          matchesPlayed: 5,
+          wins: 4,
+          pointsFor: 50,
+          pointsAgainst: 30,
+          pointDiff: 20,
+          winRate: 0.8,
+          rpDelta: 25,
+          tierAfter: 'gold',
+        },
+      ],
+      createdAt: 1_700_000_000_000,
+      expiresAt: 1_700_000_000_000 + 30 * 24 * 60 * 60 * 1000,
+    };
+    const wire = encode(board) as { createdAt: unknown; expiresAt: unknown; playedAt: unknown };
+    expect(wire.createdAt).toBeInstanceOf(Timestamp);
+    expect(wire.expiresAt).toBeInstanceOf(Timestamp);
+    expect(wire.playedAt).toBeInstanceOf(Timestamp);
+    expect(decode(encode(board))).toEqual(board);
+  });
 });

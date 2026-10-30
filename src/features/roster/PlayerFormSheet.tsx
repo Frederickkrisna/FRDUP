@@ -133,7 +133,7 @@ function Form({ onClose, hostId, player, onDeleted }: Omit<Props, 'open'>) {
               leftIcon={<ImageIcon size={14} aria-hidden="true" />}
               onClick={() => fileInputRef.current?.click()}
             >
-              Upload Foto
+              {t('roster.form.uploadPhoto')}
             </Button>
             {avatarUrl ? (
               <Button
@@ -144,7 +144,7 @@ function Form({ onClose, hostId, player, onDeleted }: Omit<Props, 'open'>) {
                 leftIcon={<Trash2 size={14} aria-hidden="true" />}
                 onClick={() => setAvatarUrl('')}
               >
-                Hapus
+                {t('roster.form.removePhoto')}
               </Button>
             ) : null}
           </div>

@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router';
 import { useTranslation } from 'react-i18next';
-import { ArrowRight, Lock, User } from 'lucide-react';
+import { ArrowRight } from 'lucide-react';
 
 import { Button } from '@/components/Button';
 import { Chip } from '@/components/Chip';
@@ -9,7 +9,7 @@ import { TextField } from '@/components/TextField';
 import { toast } from '@/components/toast/toastStore';
 import { parseBulkNames } from '@/core/utils/avatar';
 import { hostRepo, rosterRepo } from '@/data/hostRosterRepo';
-import { signInWithCredentials } from '@/data/firebase';
+import { signInWithCredentials } from '@/data/authRepo';
 import { SportIcon, allSports, sportAccent } from '@/features/shared/sportMeta';
 import { deviceLabel } from '@/features/shared/people';
 import { useAppStore } from '@/state/appStore';
@@ -69,7 +69,7 @@ export function OnboardingScreen() {
       setStep(2);
     } catch (err: unknown) {
       const e = err as { message?: string };
-      setErrorMsg(e?.message || 'Login gagal, periksa username & password');
+      setErrorMsg(e?.message || t('onboarding.step1.loginFailed'));
     } finally {
       setBusy(false);
     }
@@ -100,15 +100,15 @@ export function OnboardingScreen() {
             }}
           >
             <div>
-              <h1 className="text-[32px] font-extrabold leading-[1.15]">Masuk Akun</h1>
+              <h1 className="text-[32px] font-extrabold leading-[1.15]">{t('onboarding.step1.loginTitle')}</h1>
               <p className="mt-2 text-[15px] text-ink-muted">
-                Gunakan akun Fred untuk berbagi progres dan sinkronisasi data antar perangkat.
+                {t('onboarding.step1.loginSubtitle')}
               </p>
             </div>
 
             <div className="flex flex-col gap-4">
               <TextField
-                label="Username"
+                label={t('onboarding.step1.usernameLabel')}
                 placeholder="fred"
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
@@ -116,7 +116,7 @@ export function OnboardingScreen() {
                 maxLength={40}
               />
               <TextField
-                label="Password"
+                label={t('onboarding.step1.passwordLabel')}
                 placeholder="asdasd"
                 type="password"
                 value={password}
@@ -131,7 +131,7 @@ export function OnboardingScreen() {
 
             <div className="mt-auto flex flex-col gap-2 pb-4">
               <Button type="submit" size="lg" fullWidth loading={busy} disabled={!username.trim() || !password}>
-                Masuk & Lanjutkan
+                {t('onboarding.step1.loginCta')}
               </Button>
             </div>
           </form>

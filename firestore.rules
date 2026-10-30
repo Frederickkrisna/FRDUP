@@ -93,6 +93,19 @@ service cloud.firestore {
       }
     }
 
+    /* ---------- Public leaderboard boards: known-id read, host-only write ---------- */
+    match /public_boards/{boardId} {
+      // Anyone holding the id can read; rule enforces TTL so expired docs are unreadable.
+      allow get:    if resource.data.expiresAt > request.time;
+      allow list:   if false;
+      allow create: if signedIn()
+                    && request.resource.data.hostId == uid()
+                    && request.resource.data.expiresAt is timestamp
+                    && request.resource.data.entries is list;
+      allow delete: if signedIn() && resource.data.hostId == uid();
+      allow update: if false;
+    }
+
     match /{document=**} {
       allow read, write: if false;
     }

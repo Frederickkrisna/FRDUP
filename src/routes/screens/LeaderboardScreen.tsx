@@ -98,7 +98,7 @@ export function LeaderboardScreen() {
                       <div className="min-w-0 flex-1">
                         <p className="truncate text-[16px] font-semibold leading-tight">{r.nickname || r.name}</p>
                         <p className="num truncate text-[12px] text-ink-muted">
-                          W-L-T: <span className="font-semibold text-ink">{wins}-{losses}-0</span> · WR: {winRate}% · {matches}M
+                          {t('board.stats', { wins, losses, winRate, matches })}
                         </p>
                       </div>
                       <div className="flex items-center gap-2">

@@ -31,7 +31,13 @@
     "step1": {
       "title": "What should we call you?",
       "placeholder": "Your name",
-      "cta": "Get Started"
+      "cta": "Get Started",
+      "loginTitle": "Account Login",
+      "loginSubtitle": "Use your Fred account to share progress and sync data across devices.",
+      "usernameLabel": "Username",
+      "passwordLabel": "Password",
+      "loginCta": "Sign In & Continue",
+      "loginFailed": "Login failed, please check username & password"
     },
     "step2": {
       "title": "Favourite sport?",
@@ -73,6 +79,10 @@
       "guest": "Guest player (not ranked)",
       "cta": "Save"
     },
+    "form": {
+      "uploadPhoto": "Upload Photo",
+      "removePhoto": "Remove"
+    },
     "editPlayer": {
       "title": "Edit Player",
       "archiveConfirm": "Archive {{name}}?",
@@ -111,8 +121,23 @@
         "count": "Number of Courts",
         "label": "Label",
         "targetRounds": "Target Rounds",
+        "targetRoundsHint": "Choose court rental duration or specify number of rounds",
         "duration": "Duration",
-        "fairnessPreview": "{{players}} players, {{courts}} courts → {{playing}} playing, {{resting}} resting each round"
+        "openEnded": "Open-Ended",
+        "fairnessPreview": "{{players}} players, {{courts}} courts → {{playing}} playing, {{resting}} resting each round",
+        "countHint": "Max {{max}} courts",
+        "labelN": "Label {{n}}",
+        "underfilled": "Need min {{needed}} players per court — only {{active}} active courts",
+        "restNote": "Resting players rotate each round",
+        "preset1h": "1 Hour",
+        "preset1h5": "1.5 Hours",
+        "preset2h": "2 Hours",
+        "preset2h5": "2.5 Hours",
+        "preset3h": "3 Hours",
+        "presetRounds": "~{{n}} rounds",
+        "customRounds": "{{n}} Rounds",
+        "customEstimate": "Estimated ~{{min}} mins (can end anytime)",
+        "openEndedNote": "Open-ended mode: Play as many rounds as desired, then finish the session anytime."
       },
       "format": {
         "title": "Game Format",
@@ -145,7 +170,12 @@
       "substitute": "Substitute Player",
       "claimCourt": "Claim Court",
       "courtClaimed": "Claimed",
-      "scoreUpdatedByCohost": "Court {{court}} score updated by {{device}}"
+      "scoreUpdatedByCohost": "Court {{court}} score updated by {{device}}",
+      "reshuffle": "Reshuffle",
+      "finishSession": "Finish Session",
+      "standings": "Standings",
+      "finish": "Finish",
+      "finishTitle": "Finish session now & view final results"
     },
     "standings": {
       "title": "Standings",
@@ -181,7 +211,8 @@
       "tierUp": "Tier Up! 🎉",
       "skipAll": "Skip all",
       "continueToBill": "Continue to Bill",
-      "sessionAlreadyCommitted": "This session has already been committed"
+      "sessionAlreadyCommitted": "This session has already been committed",
+      "playerStats": "{{points}} Pts · {{wins}}W-{{losses}}L"
     }
   },
   "bill": {
@@ -302,6 +333,10 @@
   "settings": {
     "title": "Settings",
     "hostName": "Host Name",
+    "profile": "Profile",
+    "account": "Account",
+    "accountSubtitle": "Shared account (fred@frdup.app)",
+    "signOut": "Sign Out",
     "language": "Language",
     "languageId": "Indonesian",
     "languageEn": "English",
@@ -352,6 +387,15 @@
       "duration": "Duration",
       "viewBill": "View Bill"
     }
+  },
+  "board": {
+    "title": "Overall Leaderboard",
+    "empty": {
+      "title": "No ranked players yet",
+      "body": "Complete a session to start tracking player ranks and performance."
+    },
+    "rankLabel": "Rank {{rank}}",
+    "stats": "W-L-T: {{wins}}-{{losses}}-0 · WR: {{winRate}}% · {{matches}}M"
   },
   "sync": {
     "idle": "Synced",

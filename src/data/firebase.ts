@@ -9,7 +9,6 @@ import { initializeApp, getApps, type FirebaseApp } from 'firebase/app';
 import {
   connectAuthEmulator,
   getAuth,
-  signInAnonymously,
   signInWithEmailAndPassword,
   createUserWithEmailAndPassword,
   type Auth,

@@ -38,7 +38,7 @@ export function Avatar({ name, initials, color, src, size = 'md', ring, classNam
     >
       {isImage ? (
         <img
-          src={src!}
+          src={src ?? ''}
           alt={name}
           className="size-full rounded-full object-cover"
           onError={() => setLoadError(true)}
