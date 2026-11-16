@@ -157,7 +157,6 @@
       "ronde": "Round {{number}}",
       "nextRound": "Next Round",
       "nextRoundConfirm": "Start round {{number}}?",
-      "allMatchesMustComplete": "All matches must be completed first",
       "resting": "Resting",
       "noResting": "All players active",
       "vsLabel": "vs",
@@ -173,8 +172,7 @@
       "scoreUpdatedByCohost": "Court {{court}} score updated by {{device}}",
       "reshuffle": "Reshuffle",
       "finishSession": "Finish Session",
-      "standings": "Standings",
-      "finish": "Finish",
+      "finish": "End",
       "finishTitle": "Finish session now & view final results"
     },
     "standings": {
@@ -188,16 +186,6 @@
       "diff": "+/-",
       "winRate": "WR",
       "noData": "No completed matches yet"
-    },
-    "rounds": {
-      "title": "Rounds",
-      "round": "Round {{number}}",
-      "completed": "Completed",
-      "inProgress": "In Progress",
-      "scheduled": "Scheduled",
-      "editScoreNotice": "Standings and upcoming rounds will update.",
-      "regenerate": "Regenerate Round",
-      "seed": "Seed: {{seed}} · Cost: {{cost}}"
     },
     "finish": {
       "title": "Finish Session",

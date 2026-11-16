@@ -3,6 +3,7 @@
  * without importing Firebase directly in UI layers.
  */
 import {
+  ensureGuestUid,
   ensureSignedIn,
   signInWithCredentials,
   signOutDevice,
@@ -10,10 +11,11 @@ import {
 } from './firebase';
 
 export const authRepo = {
+  ensureGuestUid,
   ensureSignedIn,
   signInWithCredentials,
   signOutDevice,
   currentUid,
 };
 
-export { signInWithCredentials, signOutDevice, currentUid, ensureSignedIn };
+export { signInWithCredentials, signOutDevice, currentUid, ensureGuestUid, ensureSignedIn };

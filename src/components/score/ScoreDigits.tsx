@@ -14,9 +14,10 @@ export function ScoreDigits({ value, size = 'xl', className }: Props) {
   return (
     <span
       className={cn(
-        'num inline-block overflow-hidden text-center font-bold leading-none text-ink',
+        'num inline-block overflow-hidden text-center font-bold leading-none',
         size === 'xl' ? 'text-[64px]' : 'text-[36px]',
-        className,
+        // Callers only pass a colour; two colour utilities on one element resolve by stylesheet order.
+        className ?? 'text-ink',
       )}
     >
       <span key={value} className="roll">

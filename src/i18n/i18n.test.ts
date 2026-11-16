@@ -55,7 +55,6 @@ describe('i18n (id is the reference locale)', () => {
       ...tiers.map((k) => `rank.tier.${k}`),
       ...['idle', 'syncing', 'offline', 'error'].map((k) => `sync.${k}`),
       ...statuses.map((k) => `session.court.status.${k}`),
-      ...['scheduled', 'inProgress', 'completed'].map((k) => `session.rounds.${k}`),
       ...['unsettled', 'insufficient_players', 'limit', 'no_session', 'readonly'].map((k) => `session.court.nextError.${k}`),
       ...['court_fee', 'shared', 'rental', 'individual'].flatMap((k) => [`bill.itemKind.${k}`, `bill.itemKindHint.${k}`]),
       ...['americano', 'mexicano'].flatMap((k) => [`session.setup.format.${k}`, `session.setup.format.${k}Desc`]),

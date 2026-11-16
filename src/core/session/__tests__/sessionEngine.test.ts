@@ -198,8 +198,8 @@ describe('participants and courts', () => {
     const off = setCourtActive(s, 'c2', false, 2);
     const shown = courtsForRound(off, round);
     expect(shown.map((c) => c.id)).toEqual(['c1', 'c2']);
-    expect(shown.find((c) => c.id === 'c2')!.retiring).toBe(true);
-    expect(shown.find((c) => c.id === 'c1')!.retiring).toBe(false);
+    expect(shown.find((c) => c.id === 'c2')!.isActive).toBe(false);
+    expect(shown[0]).toBe(off.courts[0]); // same objects: court cards are memoised on identity
     // A court switched on mid-round has no match yet, so it is not shown until a round uses it.
     const small = buildNextRound({ session: off, rounds: [], plugin, seed: 5, uid: 'h', now: 3 });
     expect(courtsForRound(s, small).map((c) => c.id)).toEqual(['c1']);

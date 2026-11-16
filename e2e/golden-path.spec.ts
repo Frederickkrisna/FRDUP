@@ -32,6 +32,13 @@ test.describe('golden path (host)', () => {
     await page.getByRole('button', { name: 'Ronde Berikutnya' }).click();
     await expect(page.getByRole('heading', { name: 'Ronde 2', exact: true })).toBeVisible();
 
+    // Round navigation: open round 1 again (still correctable), then return to the live round
+    await page.getByRole('button', { name: 'Ronde 1', exact: true }).click();
+    await expect(page.getByRole('heading', { name: 'Ronde 1', exact: true })).toBeVisible();
+    await expect(court(page, 0).getByRole('button', { name: 'Buka Ulang' })).toBeVisible();
+    await page.getByRole('button', { name: 'Kembali ke Ronde 2' }).click();
+    await expect(page.getByRole('heading', { name: 'Ronde 2', exact: true })).toBeVisible();
+
     await playMatch(page, 0, 12);
     await playMatch(page, 1, 8);
 

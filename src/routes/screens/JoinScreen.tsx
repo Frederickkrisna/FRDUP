@@ -8,6 +8,7 @@ import { ScreenHeader } from '@/components/ScreenHeader';
 import { TextField } from '@/components/TextField';
 import { JoinCodeExpiredError, JoinCodeInvalidError } from '@/core/matchmaking/errors';
 import { JOIN_CODE_LENGTH, extractJoinCode, normalizeJoinCode } from '@/core/session/joinCode';
+import { ensureGuestUid } from '@/data/authRepo';
 import { roundRepo, sessionRepo } from '@/data/sessionRepo';
 import { deviceLabel } from '@/features/shared/people';
 import { useBootStore } from '@/state/bootStore';
@@ -43,11 +44,13 @@ export function JoinScreen() {
   };
 
   const join = async (value: string) => {
-    if (!uid) return;
     setPhase({ kind: 'joining' });
     try {
+      // A phone that only scanned the QR has no account: join as a silent guest.
+      const me = uid ?? (await ensureGuestUid());
+      if (!uid) useBootStore.setState({ uid: me });
       const session = await sessionRepo.resolveJoinCode(value);
-      await sessionRepo.attachCoHost(session.id, { id: uid, sessionId: session.id, label: label.trim() || deviceLabel(), joinedAt: Date.now(), claimedCourtIds: [], lastSeenAt: Date.now() });
+      await sessionRepo.attachCoHost(session.id, { id: me, sessionId: session.id, label: label.trim() || deviceLabel(), joinedAt: Date.now(), claimedCourtIds: [], lastSeenAt: Date.now() });
       const rounds = await roundRepo.listBySession(session.id);
       joinAsCoHost(session, rounds, []);
       void navigate(`/session/${session.id}/courts`, { replace: true });
@@ -68,11 +71,11 @@ export function JoinScreen() {
 
   // Deep link /join/ABC234: resolve straight away.
   useEffect(() => {
-    if (autoTried.current || !initial || !uid || !online) return;
+    if (autoTried.current || !initial || !online) return;
     autoTried.current = true;
     void join(initial);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [initial, uid, online]);
+  }, [initial, online]);
 
   const onKey = (i: number) => (e: KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Backspace' && !chars[i]) refs.current[i - 1]?.focus();

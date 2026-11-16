@@ -15,7 +15,10 @@ export interface PadLabels {
   deuce: string;
   /** e.g. "Target 21 · menang selisih 2 · maks 30" */
   rule: string;
-  sliderLabel: string;
+  /** Fixed-sum grid: caption naming the side a tapped number goes to. */
+  pickFor: (team: string) => string;
+  /** Fixed-sum grid: accessible name of one number key. */
+  setScore: (team: string, value: number) => string;
 }
 
 export interface PadProps {

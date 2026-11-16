@@ -97,7 +97,7 @@ export function StandingsScreen() {
                     <div className="min-w-0 flex-1">
                       <p className="truncate font-semibold leading-tight">{displayName(p)}</p>
                       {delta !== null ? (
-                        <p className="num truncate text-[11px] leading-tight text-ink-muted" title={t('session.standings.projectedHint')}>
+                        <p className="truncate text-[11px] leading-tight text-ink-muted" title={t('session.standings.projectedHint')}>
                           {t('session.standings.projected', { delta: delta > 0 ? `+${delta}` : String(delta) })}
                         </p>
                       ) : null}

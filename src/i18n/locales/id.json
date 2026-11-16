@@ -159,7 +159,6 @@
       "ronde": "Ronde {{number}}",
       "nextRound": "Ronde Berikutnya",
       "nextRoundConfirm": "Mulai ronde {{number}}?",
-      "allMatchesMustComplete": "Semua pertandingan harus selesai dulu",
       "resting": "Istirahat",
       "noResting": "Semua pemain aktif",
       "vsLabel": "vs",
@@ -175,8 +174,7 @@
       "scoreUpdatedByCohost": "Skor lapangan {{court}} diperbarui oleh {{device}}",
       "reshuffle": "Acak Ulang",
       "finishSession": "Selesai Sesi",
-      "standings": "Klasemen",
-      "finish": "Selesai",
+      "finish": "Akhiri",
       "finishTitle": "Akhiri sesi sekarang & lihat hasil akhir"
     },
     "standings": {
@@ -190,16 +188,6 @@
       "diff": "+/-",
       "winRate": "WR",
       "noData": "Belum ada pertandingan selesai"
-    },
-    "rounds": {
-      "title": "Ronde",
-      "round": "Ronde {{number}}",
-      "completed": "Selesai",
-      "inProgress": "Berlangsung",
-      "scheduled": "Dijadwalkan",
-      "editScoreNotice": "Klasemen & ronde berikutnya akan menyesuaikan.",
-      "regenerate": "Buat Ulang Ronde",
-      "seed": "Seed: {{seed}} · Cost: {{cost}}"
     },
     "finish": {
       "title": "Selesaikan Sesi",

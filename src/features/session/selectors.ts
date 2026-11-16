@@ -14,15 +14,13 @@ export function useCurrentRound(): RoundDoc | undefined {
 }
 
 /**
- * One court's match in the current round. The returned object keeps its identity when other courts
- * change (immutable updates only replace the edited match), so a court card re-renders ONLY when its
- * own match changes. This is the render-count contract from docs/implementation_fe.md §4.2.
+ * One court's match in a given round (the live one, or an earlier round being corrected). The match
+ * object keeps its identity when other courts change (immutable updates only replace the edited
+ * match), so a court card re-renders ONLY when its own match changes. This is the render-count
+ * contract from docs/implementation_fe.md §4.2: select the match, never the whole round.
  */
-export function useCourtMatch(courtId: Id): { roundId: Id; match: Match } | null {
-  // Select primitives / the match object only — never the whole round — or every card would re-render.
-  const roundId = useSessionStore((s) => selectCurrentRound(s)?.id);
-  const match = useSessionStore((s) => selectCurrentRound(s)?.matches.find((m) => m.courtId === courtId));
-  return useMemo(() => (roundId && match ? { roundId, match } : null), [roundId, match]);
+export function useCourtMatch(roundId: Id, courtId: Id): Match | undefined {
+  return useSessionStore((s) => s.rounds.find((r) => r.id === roundId)?.matches.find((m) => m.courtId === courtId));
 }
 
 /**

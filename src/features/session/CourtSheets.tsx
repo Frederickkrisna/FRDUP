@@ -64,7 +64,8 @@ export function ScoreSheet({ roundId, matchId, onClose }: { roundId: Id; matchId
       total: t('session.court.padTotal', { total: spec.fixedTotal ?? 0 }),
       deuce: t('session.court.deuce'),
       rule,
-      sliderLabel: t('session.court.sliderLabel'),
+      pickFor: (team) => t('session.court.pickFor', { team }),
+      setScore: (team, value) => t('session.court.setScore', { team, value }),
     };
     return { plugin, spec, teamNames, validation, blocker, labels };
   }, [match, session, byId, t]);

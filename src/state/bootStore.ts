@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 
 import { logger } from '@/core/utils/logger';
-import { FirebaseConfigError, ensureSignedIn, initFirebase } from '@/data/firebase';
+import { FirebaseConfigError, currentUid, ensureSignedIn, initFirebase } from '@/data/firebase';
 import { watchCarryOverWrites } from '@/data/observable';
 import { useAppStore } from './appStore';
 import { requestPersistentStorage } from './storage';
@@ -38,12 +38,14 @@ export const useBootStore = create<BootState>()((set, get) => ({
       set({ status: 'booting' });
       try {
         initFirebase();
-        const uid = await ensureSignedIn();
+        const account = await ensureSignedIn();
         const { hostId } = useAppStore.getState();
-        if (uid && hostId !== null && hostId !== uid) {
+        if (account && hostId !== null && hostId !== account) {
           // Sync hostId to persistent account UID
-          useAppStore.getState().setHost(uid, 'Fred');
+          useAppStore.getState().setHost(account, 'Fred');
         }
+        // A co-host that joined as an anonymous guest keeps its uid across reloads.
+        const uid = account ?? currentUid();
         set({ status: 'ready', uid });
         if (uid) {
           watchCarryOverWrites();

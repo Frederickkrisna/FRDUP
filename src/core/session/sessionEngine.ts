@@ -301,10 +301,11 @@ export function canDeactivateCourt(session: SessionDoc, courtId: Id): boolean {
 /**
  * Courts the live screen shows for a round: every court that holds a match in this round (even
  * if it was switched off mid-round, so its match can still be finished or voided), in court order.
+ * Returns the session's own court objects, so memoised court cards keep their props identity.
  */
-export function courtsForRound(session: SessionDoc, round: RoundDoc): Array<CourtDef & { retiring: boolean }> {
+export function courtsForRound(session: SessionDoc, round: RoundDoc): CourtDef[] {
   const used = new Set(round.matches.map((m) => m.courtId));
-  return session.courts.filter((c) => used.has(c.id)).map((c) => ({ ...c, retiring: !c.isActive }));
+  return session.courts.filter((c) => used.has(c.id));
 }
 
 /** Players currently playing in a round, used to validate swaps/substitutions. */

@@ -6,8 +6,9 @@ export const NAMES = ['Rizky', 'Sari', 'Budi', 'Dewi', 'Andi', 'Tono', 'Maya', '
 export async function onboard(page: Page, host = 'Frederick', names: string[] = NAMES) {
   await page.goto('/');
   await expect(page).toHaveURL(/\/onboarding$/);
-  await page.getByLabel('Namamu').fill(host);
-  await page.getByRole('button', { name: 'Mulai', exact: true }).click();
+  // Step 1 is the shared-account sign-in; a unique username keeps each test's roster separate.
+  await page.getByLabel('Username').fill(`${host.toLowerCase()}${Date.now()}`);
+  await page.getByRole('button', { name: /Masuk/ }).click();
   await page.getByRole('button', { name: 'Badminton' }).click();
   await page.getByRole('button', { name: 'Lanjut' }).click();
   await page.getByLabel('Daftar nama').fill(names.join('\n'));

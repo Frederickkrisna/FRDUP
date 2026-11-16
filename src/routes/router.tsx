@@ -46,7 +46,8 @@ export const routes: RouteObject[] = [
       { index: true, element: <Navigate to="courts" replace /> },
       { path: 'courts', lazy: screen(() => import('./session/CourtsScreen'), 'CourtsScreen') },
       { path: 'standings', lazy: screen(() => import('./session/StandingsScreen'), 'StandingsScreen') },
-      { path: 'rounds', lazy: screen(() => import('./session/RoundsScreen'), 'RoundsScreen') },
+      // Old links/bookmarks: rounds now live on the courts screen.
+      { path: 'rounds', element: <Navigate to="../courts" replace /> },
       { path: 'bill', lazy: screen(() => import('./session/BillScreen'), 'BillScreen') },
     ],
   },

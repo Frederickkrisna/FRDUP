@@ -9,6 +9,7 @@ import { initializeApp, getApps, type FirebaseApp } from 'firebase/app';
 import {
   connectAuthEmulator,
   getAuth,
+  signInAnonymously,
   signInWithEmailAndPassword,
   createUserWithEmailAndPassword,
   type Auth,
@@ -127,6 +128,16 @@ export async function signInWithCredentials(username: string, pass: string): Pro
     }
     throw err;
   }
+}
+
+/**
+ * Co-hosts never see a sign-in: a device with no account joins a session as a silent anonymous
+ * user. The join code is the credential; the rules only need `request.auth != null`.
+ */
+export async function ensureGuestUid(): Promise<string> {
+  const a = getFirebaseAuth();
+  await a.authStateReady();
+  return (a.currentUser ?? (await signInAnonymously(a)).user).uid;
 }
 
 /** Signs out the current user on this device. */

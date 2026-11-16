@@ -33,8 +33,6 @@ test('accessibility: no serious/critical WCAG A/AA violations on the core screen
 
   await page.getByRole('link', { name: 'Klasemen' }).click();
   await audit(page, 'standings');
-  await page.getByRole('link', { name: 'Ronde', exact: true }).click();
-  await audit(page, 'rounds');
 });
 
 test('reduced motion: no looping animation is left running', async ({ browser }) => {

@@ -183,15 +183,15 @@
       "body": "Sesi ini tidak ada di perangkat ini."
     },
     "header": {
-      "title": "{{sport}} · Ronde {{round}}",
       "meta": "{{players}} pemain · {{courts}} lapangan · {{elapsed}}",
-      "leave": "Kembali ke beranda (sesi tetap berjalan)"
+      "leave": "Kembali ke beranda (sesi tetap berjalan)",
+      "invite": "Undang",
+      "tools": "Alat"
     },
     "tabs": {
       "label": "Bagian sesi",
       "courts": "Lapangan",
       "standings": "Klasemen",
-      "rounds": "Ronde",
       "bill": "Tagihan"
     },
     "finishedBanner": "Sesi sudah selesai.",
@@ -253,7 +253,6 @@
       "menuTitle": "Pertandingan",
       "locked": "Klaim lapangan dulu",
       "padTotal": "Total: {{total}}",
-      "sliderLabel": "Pembagian skor",
       "deuce": "DEUCE",
       "ruleCap": "Target {{target}} · menang selisih 2 · maks {{cap}}",
       "ruleNoCap": "Target {{target}} · menang selisih 2",
@@ -298,7 +297,15 @@
       "benchPlaysNow": "Istirahat · main sekarang",
       "playInsteadOf": "{{name}} main gantikan…",
       "noBenchHint": "Tidak ada yang istirahat ronde ini. Tukar dengan pemain di lapangan lain, atau tunggu dia kembali.",
-      "benchSwapDone": "{{inn}} main sekarang. {{out}} istirahat dan main di ronde berikutnya."
+      "benchSwapDone": "{{inn}} main sekarang. {{out}} istirahat dan main di ronde berikutnya.",
+      "roundNav": "Pilih ronde",
+      "roundPill": "Ronde {{number}}",
+      "roundPillLive": "Ronde {{number}}, sedang berjalan",
+      "progress": "{{done}}/{{total}} selesai",
+      "pastRoundNote": "Ini ronde yang sudah lewat. Skor yang kamu ubah di sini langsung mengubah klasemen.",
+      "backToLive": "Kembali ke Ronde {{number}}",
+      "pickFor": "Ketuk skor {{team}}",
+      "setScore": "Skor {{team}} jadi {{value}}"
     },
     "standings": {
       "noDataBody": "Klasemen muncul setelah pertandingan pertama selesai.",
@@ -312,10 +319,6 @@
       "playedShort": "Main",
       "record": "M-K",
       "recordDraws": "M-K-S"
-    },
-    "rounds": {
-      "empty": "Belum ada ronde",
-      "seed": "Seed {{seed}} · revisi {{revision}}"
     },
     "finish": {
       "doneTitle": "Sesi selesai",
