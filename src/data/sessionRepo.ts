@@ -111,9 +111,15 @@ export const sessionRepo = {
     return session;
   },
 
-  /** Full replace: the live store is the source of truth, Firestore is the replica. */
-  put(session: SessionDoc): void {
-    track('session.put', setDoc(paths.session(session.id), encode(session)));
+  /**
+   * Full replace: the live store is the source of truth, Firestore is the replica.
+   * Resolves when the SERVER has the write (offline: when it is back), so the caller only then
+   * forgets that it was dirty.
+   */
+  put(session: SessionDoc): Promise<void> {
+    const write = setDoc(paths.session(session.id), encode(session));
+    track('session.put', write);
+    return write;
   },
 
   async get(sessionId: Id): Promise<SessionDoc | null> {
@@ -289,9 +295,16 @@ export const roundRepo = {
     });
   },
 
-  /** Last-write-wins full write. Used offline, or when no co-host is registered. */
-  upsert(sessionId: Id, round: RoundDoc): void {
-    track('round.upsert', setDoc(paths.round(sessionId, round.id), encode(round)));
+  /** Last-write-wins full write. Used offline, or when no co-host is registered. Resolves on server ack. */
+  upsert(sessionId: Id, round: RoundDoc): Promise<void> {
+    const write = setDoc(paths.round(sessionId, round.id), encode(round));
+    track('round.upsert', write);
+    return write;
+  },
+
+  /** A pre-built round nobody played, dropped when the session ends. */
+  remove(sessionId: Id, roundId: Id): void {
+    track('round.remove', deleteDoc(paths.round(sessionId, roundId)));
   },
 
   /**
@@ -344,7 +357,10 @@ export const billRepo = {
     );
   },
 
-  save(sessionId: Id, bill: BillDoc): void {
-    track('bill.save', setDoc(paths.bill(sessionId), encode(bill)));
+  /** Resolves on server ack, like the other replica writes. */
+  save(sessionId: Id, bill: BillDoc): Promise<void> {
+    const write = setDoc(paths.bill(sessionId), encode(bill));
+    track('bill.save', write);
+    return write;
   },
 };

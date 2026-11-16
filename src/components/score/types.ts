@@ -29,4 +29,6 @@ export interface PadProps {
   disabled?: boolean;
   labels: PadLabels;
   onChange: (change: ScoreChange) => void;
+  /** A tap that is a whole final score (fixed-sum grid): the host saves, completes and closes. */
+  onSubmit?: (change: ScoreChange) => void;
 }

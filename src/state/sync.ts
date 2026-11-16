@@ -31,11 +31,11 @@ function needsCas(): boolean {
   return role === 'cohost' || coHosts.length > 0;
 }
 
+/** Resolves once the server holds this round (directly, or through the offline queue later). */
 async function writeRound(sessionId: Id, round: RoundDoc): Promise<void> {
   if (!needsCas()) {
-    roundRepo.upsert(sessionId, round);
     useSessionStore.getState().markRoundBase(round.id, round.revision);
-    return;
+    return roundRepo.upsert(sessionId, round);
   }
   const store = useSessionStore.getState();
   const base = store.baseRevision[round.id] ?? 0;
@@ -51,13 +51,39 @@ async function writeRound(sessionId: Id, round: RoundDoc): Promise<void> {
     useSessionStore.getState().applyRemoteRounds([first.remote]);
     const second = await roundRepo.commitRound(sessionId, merged, first.remote.revision);
     if (second.status === 'ok') useSessionStore.getState().markRoundBase(round.id, merged.revision);
-    else roundRepo.upsert(sessionId, merged); // lost the race twice: last write wins, never drop a score
+    else await roundRepo.upsert(sessionId, merged); // lost the race twice: last write wins, never drop a score
   } catch (error) {
     // Network dropped mid-transaction: fall back to the durable offline queue.
     logger.warn('CAS write failed; queueing last-write-wins', (error as { code?: string }).code);
-    roundRepo.upsert(sessionId, round);
+    await roundRepo.upsert(sessionId, round);
   }
 }
+
+/**
+ * The exact object last handed to Firestore per document, until the server acknowledges it.
+ * Dirty flags are cleared only on that acknowledgement: a reload or a closed tab before the ack
+ * leaves the flag set (it is persisted), so the next start sends the write again. Clearing at send
+ * time lost the last score whenever the page went away before Firestore's own queue was saved.
+ */
+const inflight = new Map<string, unknown>();
+
+function send(key: string, value: unknown, write: () => Promise<void>, onAck: () => void): void {
+  if (inflight.get(key) === value) return; // already on its way (Firestore redelivers after reconnects)
+  inflight.set(key, value);
+  write().then(
+    () => {
+      if (inflight.get(key) === value) inflight.delete(key);
+      onAck();
+    },
+    (error: unknown) => {
+      // Stays dirty: the next edit, reconnect or app start retries it.
+      if (inflight.get(key) === value) inflight.delete(key);
+      logger.warn(`replica write failed: ${key}`, (error as { code?: string } | null)?.code);
+    },
+  );
+}
+
+const NO_FLUSH = { roundIds: [] as Id[], session: false, bill: false };
 
 export async function flushNow(): Promise<void> {
   if (flushing) return scheduleFlush();
@@ -66,28 +92,27 @@ export async function flushNow(): Promise<void> {
     const s = useSessionStore.getState();
     const { session } = s;
     if (!session) return;
+    const sessionId = session.id;
+    const store = () => useSessionStore.getState();
 
-    const roundIds = [...s.dirtyRounds];
-    const sessionDirty = s.sessionDirty;
-    const billDirty = s.billDirty;
-
-    if (sessionDirty && s.role === 'host') sessionRepo.put(session);
-    if (billDirty && s.role === 'host' && s.bill) billRepo.save(session.id, s.bill);
-    const written = new Map<string, RoundDoc>();
-    for (const id of roundIds) {
-      const round = useSessionStore.getState().rounds.find((r) => r.id === id);
-      if (round) {
-        await writeRound(session.id, round);
-        written.set(id, round);
-      }
+    if (s.sessionDirty) {
+      // A co-host never writes the session document: nothing to wait for.
+      if (s.role !== 'host') store().markFlushed({ ...NO_FLUSH, session: true });
+      else send('session', session, () => sessionRepo.put(session), () => store().session === session && store().markFlushed({ ...NO_FLUSH, session: true }));
     }
-    // An edit that landed during the awaits above must stay dirty (its own scheduled flush picks it up).
-    const now = useSessionStore.getState();
-    const settled = roundIds.filter((id) => {
-      const w = written.get(id);
-      return !w || now.rounds.find((r) => r.id === id) === w;
-    });
-    now.markFlushed({ roundIds: settled, session: sessionDirty && now.session === session, bill: billDirty && now.bill === s.bill });
+    const bill = s.bill;
+    if (s.billDirty && s.role === 'host' && bill) {
+      send('bill', bill, () => billRepo.save(sessionId, bill), () => store().bill === bill && store().markFlushed({ ...NO_FLUSH, bill: true }));
+    }
+    for (const id of s.dirtyRounds) {
+      const round = s.rounds.find((r) => r.id === id);
+      if (!round) {
+        store().markFlushed({ ...NO_FLUSH, roundIds: [id] }); // dropped locally (e.g. unplayed round at finish)
+        continue;
+      }
+      // An edit after this send replaces the object, so the ack of an older version clears nothing.
+      send(`round:${id}`, round, () => writeRound(sessionId, round), () => store().rounds.find((r) => r.id === id) === round && store().markFlushed({ ...NO_FLUSH, roundIds: [id] }));
+    }
   } catch (error) {
     logger.error('flush failed', error);
   } finally {
@@ -101,7 +126,10 @@ export function startSessionSync(): () => void {
     const changed =
       state.dirtyRounds.length > 0 &&
       (state.dirtyRounds !== prev.dirtyRounds || state.rounds !== prev.rounds);
-    if (changed || (state.sessionDirty && !prev.sessionDirty) || (state.billDirty && !prev.billDirty)) scheduleFlush();
+    // Dirty flags stay up until the server acks, so a newer version while one is in flight must also flush.
+    const sessionChanged = state.sessionDirty && (!prev.sessionDirty || state.session !== prev.session);
+    const billChanged = state.billDirty && (!prev.billDirty || state.bill !== prev.bill);
+    if (changed || sessionChanged || billChanged) scheduleFlush();
   });
 
   const flushImmediately = () => {

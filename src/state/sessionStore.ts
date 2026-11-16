@@ -16,17 +16,22 @@ import type { SportPlugin } from '@/types/sport';
 import { CourtNotClaimedError, InsufficientPlayersError, SessionAlreadyCommittedError } from '@/core/matchmaking/errors';
 import { getSportPlugin } from '@/core/sports/registry';
 import { billIssues, newBill, recomputeBill, upsertItem, type BillIssue } from '@/core/session/bill';
-import { buildFinish, unsettledMatchCount, type FinishResult } from '@/core/session/finish';
+import { buildFinish, playedRounds, unsettledMatchCount, type FinishResult } from '@/core/session/finish';
 import {
   LIMITS,
   addParticipant as addParticipantPure,
   allMatchesSettled,
   buildNextRound,
+  buildSchedule,
   completeMatch as completeMatchPure,
   removeParticipant as removeParticipantPure,
   reopenMatch as reopenMatchPure,
   resetMatchScore,
   canDeactivateCourt,
+  isRoundUntouched,
+  liveRound,
+  plansAllRounds,
+  rebuildUntouched,
   setCourtActive as setCourtActivePure,
   setMatchScore,
   substituteInRound,
@@ -37,7 +42,7 @@ import {
   type ScoreChange,
 } from '@/core/session/sessionEngine';
 import { mergeRounds, type Role } from '@/core/session/merge';
-import { newSessionDoc } from '@/data/sessionRepo';
+import { newSessionDoc, roundRepo } from '@/data/sessionRepo';
 import { statsRepo } from '@/data/statsRepo';
 import { useBootStore } from './bootStore';
 import { jsonStorage } from './storage';
@@ -88,10 +93,13 @@ interface SessionState {
 
   /* rounds */
   generateNextRound: () => NextRoundResult;
-  reshuffleCurrentRound: () => NextRoundResult;
+  /** "Acak ulang": rebuilds this untouched round and every untouched round after it. */
+  reshuffleRound: (roundId: Id) => NextRoundResult;
 
   /* scoring */
   setScore: (roundId: Id, matchId: Id, change: ScoreChange) => void;
+  /** One tap on the fixed-sum grid: set the score and complete the match (one undo step). */
+  setFinalScore: (roundId: Id, matchId: Id, change: ScoreChange) => void;
   completeMatch: (roundId: Id, matchId: Id) => void;
   reopenMatch: (roundId: Id, matchId: Id) => void;
   voidMatch: (roundId: Id, matchId: Id) => void;
@@ -101,7 +109,7 @@ interface SessionState {
 
   /* overrides */
   swapPlayers: (roundId: Id, a: Id, b: Id) => void;
-  substitute: (outId: Id, inId: Id) => void;
+  substitute: (roundId: Id, outId: Id, inId: Id) => void;
   addParticipant: (participant: SessionParticipant) => void;
   removeParticipant: (playerId: Id) => void;
   /** Takes effect immediately if the current round is untouched, otherwise from the next round. */
@@ -187,6 +195,24 @@ export const useSessionStore = create<SessionState>()(
       const markRoundDirty = (roundId: Id) =>
         set((s) => ({ dirtyRounds: s.dirtyRounds.includes(roundId) ? s.dirtyRounds : [...s.dirtyRounds, roundId] }));
 
+      /**
+       * Re-plans every untouched round from `fromRound` on for `session` (roster, courts or rests just
+       * changed), so pre-built rounds never keep a player who left or a court that is off.
+       * Returns the rebuilt round ids, or null when too few players are left (rounds kept as they were).
+       */
+      const replan = (session: SessionDoc, fromRound: number): Id[] | null => {
+        const { rounds } = get();
+        try {
+          const next = rebuildUntouched({ session, rounds, fromRound, plugin: pluginOf(session), seed: randomSeed(), uid: uidNow(), now: Date.now() });
+          const rebuilt = next.filter((r) => !rounds.includes(r)).map((r) => r.id);
+          if (rebuilt.length > 0) set((s) => ({ rounds: next, dirtyRounds: [...new Set([...s.dirtyRounds, ...rebuilt])] }));
+          return rebuilt;
+        } catch (error) {
+          if (error instanceof InsufficientPlayersError) return null;
+          throw error;
+        }
+      };
+
       return {
         session: null,
         rounds: [],
@@ -211,23 +237,25 @@ export const useSessionStore = create<SessionState>()(
           const now = Date.now();
           const session = newSessionDoc(input, now);
           const plugin = pluginOf(session);
-          let round: RoundDoc;
+          let rounds: RoundDoc[];
           try {
-            round = buildNextRound({ session, rounds: [], plugin, seed: randomSeed(), uid: uidNow(), now });
+            rounds = plansAllRounds(session)
+              ? buildSchedule({ session, plugin, count: Math.min(session.targetRounds ?? 1, LIMITS.rounds), seed: randomSeed(), uid: uidNow(), now })
+              : [buildNextRound({ session, rounds: [], plugin, seed: randomSeed(), uid: uidNow(), now })];
           } catch (error) {
             if (error instanceof InsufficientPlayersError) return { ok: false, error: 'insufficient_players' };
             throw error;
           }
           set({
             session,
-            rounds: [round],
+            rounds,
             bill: null,
             billIssues: [],
             finish: null,
             role: 'host',
             claimedCourtIds: [],
             baseRevision: {},
-            dirtyRounds: [round.id],
+            dirtyRounds: rounds.map((r) => r.id),
             sessionDirty: true,
             billDirty: false,
             undo: [],
@@ -288,25 +316,13 @@ export const useSessionStore = create<SessionState>()(
           }
         },
 
-        /** "Acak ulang": only while nothing on the current round has been scored. */
-        reshuffleCurrentRound: () => {
+        reshuffleRound: (roundId) => {
           const { session, rounds, role } = get();
           if (!session) return { ok: false, error: 'no_session' };
           if (role === 'cohost') return { ok: false, error: 'readonly' };
-          const current = sortRounds(rounds).at(-1);
-          if (!current || current.matches.some((m) => m.status !== 'scheduled')) return { ok: false, error: 'unsettled' };
-          const now = Date.now();
-          const others = rounds.filter((r) => r.id !== current.id);
-          try {
-            const fresh = buildNextRound({ session, rounds: others, plugin: pluginOf(session), seed: randomSeed(), uid: uidNow(), now });
-            const replaced: RoundDoc = { ...fresh, id: current.id, createdAt: current.createdAt, revision: current.revision + 1 };
-            set((s) => ({ rounds: replaceRound(s.rounds, replaced) }));
-            markRoundDirty(replaced.id);
-            return { ok: true, roundNumber: replaced.roundNumber };
-          } catch (error) {
-            if (error instanceof InsufficientPlayersError) return { ok: false, error: 'insufficient_players' };
-            throw error;
-          }
+          const round = rounds.find((r) => r.id === roundId);
+          if (!round || !isRoundUntouched(round)) return { ok: false, error: 'unsettled' };
+          return replan(session, round.roundNumber) ? { ok: true, roundNumber: round.roundNumber } : { ok: false, error: 'insufficient_players' };
         },
 
         /* ------------------------------------------------------------------- scoring */
@@ -315,6 +331,15 @@ export const useSessionStore = create<SessionState>()(
           editMatch(roundId, matchId, 'score', (round, plugin, session) =>
             setMatchScore(round, matchId, change, plugin, session.scoreInput, uidNow(), Date.now()),
           ),
+
+        setFinalScore: (roundId, matchId, change) =>
+          editMatch(roundId, matchId, 'complete', (round, plugin, session) => {
+            const uid = uidNow();
+            const now = Date.now();
+            const reopened = round.matches.find((m) => m.id === matchId)?.status === 'completed' ? reopenMatchPure(round, matchId, uid, now) : round;
+            const scored = setMatchScore(reopened, matchId, change, plugin, session.scoreInput, uid, now);
+            return completeMatchPure(scored, matchId, plugin, session.scoreInput, uid, now);
+          }),
 
         completeMatch: (roundId, matchId) =>
           editMatch(roundId, matchId, 'complete', (round, plugin, session) =>
@@ -360,7 +385,7 @@ export const useSessionStore = create<SessionState>()(
           const now = Date.now();
           const dirty: Id[] = [];
           const next = rounds.map((r) => {
-            if (r.matches.every((m) => m.status === 'completed' || m.status === 'voided')) return r;
+            if (r.matches.every((m) => m.status === 'completed' || m.status === 'voided') || isRoundUntouched(r)) return r;
             dirty.push(r.id);
             return voidUnsettled(r, uidNow(), now);
           });
@@ -374,12 +399,15 @@ export const useSessionStore = create<SessionState>()(
           if (!round || get().role === 'cohost') return;
           set((s) => ({ rounds: replaceRound(s.rounds, swapInRound(round, a, b, uidNow(), Date.now())) }));
           markRoundDirty(roundId);
+          // Whoever went to the bench rested this round: the next rounds must play them (no back-to-back rest).
+          const session = get().session;
+          if (session && (round.restingPlayerIds.includes(a) || round.restingPlayerIds.includes(b))) replan(session, round.roundNumber + 1);
         },
 
-        substitute: (outId, inId) => {
+        substitute: (roundId, outId, inId) => {
           const { session, rounds, role } = get();
           if (!session || role === 'cohost') return;
-          const current = sortRounds(rounds).at(-1);
+          const current = rounds.find((r) => r.id === roundId);
           if (!current) return;
           const now = Date.now();
           const fromRound = current.roundNumber + 1;
@@ -391,20 +419,25 @@ export const useSessionStore = create<SessionState>()(
           if (inP) nextSession = addParticipantPure(nextSession, { ...inP, leftAtRound: null }, current.roundNumber, now);
           set((s) => ({ rounds: replaceRound(s.rounds, nextRound), session: nextSession, sessionDirty: true }));
           markRoundDirty(current.id);
+          replan(nextSession, fromRound);
         },
 
         addParticipant: (participant) => {
           const { session, rounds, role } = get();
           if (!session || role === 'cohost') return;
-          const from = (sortRounds(rounds).at(-1)?.roundNumber ?? 0) + 1;
-          set({ session: addParticipantPure(session, participant, from, Date.now()), sessionDirty: true });
+          const from = (liveRound(rounds)?.roundNumber ?? 0) + 1;
+          const next = addParticipantPure(session, participant, from, Date.now());
+          set({ session: next, sessionDirty: true });
+          replan(next, from);
         },
 
         removeParticipant: (playerId) => {
           const { session, rounds, role } = get();
           if (!session || role === 'cohost') return;
-          const from = (sortRounds(rounds).at(-1)?.roundNumber ?? 0) + 1;
-          set({ session: removeParticipantPure(session, playerId, from, Date.now()), sessionDirty: true });
+          const from = (liveRound(rounds)?.roundNumber ?? 0) + 1;
+          const next = removeParticipantPure(session, playerId, from, Date.now());
+          set({ session: next, sessionDirty: true });
+          replan(next, from);
         },
 
         setCourtActive: (courtId, active) => {
@@ -416,21 +449,12 @@ export const useSessionStore = create<SessionState>()(
           const nextSession = setCourtActivePure(session, courtId, active, now);
           set({ session: nextSession, sessionDirty: true });
 
-          // Nothing scored yet on the current round: rebuild it now so the change is visible at once
-          // (a court switched off disappears, a court switched on gets a match).
-          const current = sortRounds(rounds).at(-1);
-          if (!current || !current.matches.every((m) => m.status === 'scheduled')) return { ok: true, appliedNow: false };
-          try {
-            const others = rounds.filter((r) => r.id !== current.id);
-            const fresh = buildNextRound({ session: nextSession, rounds: others, plugin: pluginOf(nextSession), seed: randomSeed(), uid: uidNow(), now });
-            const replaced: RoundDoc = { ...fresh, id: current.id, createdAt: current.createdAt, revision: current.revision + 1 };
-            set((s) => ({ rounds: replaceRound(s.rounds, replaced) }));
-            markRoundDirty(replaced.id);
-            return { ok: true, appliedNow: true };
-          } catch (error) {
-            if (error instanceof InsufficientPlayersError) return { ok: true, appliedNow: false };
-            throw error;
-          }
+          // Nothing scored yet on the live round: rebuild it now so the change is visible at once
+          // (a court switched off disappears, a court switched on gets a match). Later untouched rounds follow.
+          const live = liveRound(rounds);
+          const from = live && isRoundUntouched(live) ? live.roundNumber : (live?.roundNumber ?? 0) + 1;
+          const rebuilt = replan(nextSession, from);
+          return { ok: true, appliedNow: !!live && !!rebuilt?.includes(live.id) };
         },
 
         claimCourts: (courtIds) => set({ claimedCourtIds: courtIds }),
@@ -469,9 +493,12 @@ export const useSessionStore = create<SessionState>()(
         /* -------------------------------------------------------------------- finish */
 
         finishSession: async (hostId) => {
-          const { session, rounds } = get();
+          const { session, rounds: all } = get();
           if (!session) throw new Error('no active session');
-          if (unsettledMatchCount(rounds) > 0) throw new Error('unsettled matches');
+          if (unsettledMatchCount(all) > 0) throw new Error('unsettled matches');
+          // Pre-built rounds nobody started (stopped early) are dropped, as chosen by the user (2026-11-17).
+          const rounds = playedRounds(all);
+          const dropped = all.filter((r) => !rounds.includes(r)).map((r) => r.id);
           const plugin = pluginOf(session);
           const now = Date.now();
 
@@ -499,7 +526,8 @@ export const useSessionStore = create<SessionState>()(
           await statsRepo.commitSessionResults(hostId, session.id, result.payload).catch((error: unknown) => {
             if (!(error instanceof SessionAlreadyCommittedError)) throw error;
           });
-          set({ session: finished, finish: result, sessionDirty: true });
+          set((s) => ({ session: finished, finish: result, sessionDirty: true, rounds, dirtyRounds: s.dirtyRounds.filter((id) => !dropped.includes(id)) }));
+          for (const id of dropped) roundRepo.remove(session.id, id);
           return result;
         },
 
@@ -618,11 +646,8 @@ export const useSessionStore = create<SessionState>()(
 
 /* -------------------------------------------------------------------------- selectors */
 
-export const selectCurrentRound = (s: SessionState): RoundDoc | undefined => {
-  let best: RoundDoc | undefined;
-  for (const r of s.rounds) if (!best || r.roundNumber > best.roundNumber) best = r;
-  return best;
-};
+/** The round being played (with a pre-built schedule that is not the newest one). */
+export const selectCurrentRound = (s: SessionState): RoundDoc | undefined => liveRound(s.rounds);
 
 export const selectPlugin = (s: SessionState): SportPlugin | null => (s.session ? getSportPlugin(s.session.sportId) : null);
 

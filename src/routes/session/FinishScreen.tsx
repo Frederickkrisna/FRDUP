@@ -12,7 +12,7 @@ import { ScreenHeader } from '@/components/ScreenHeader';
 import { TierBadge } from '@/components/TierBadge';
 import { cn } from '@/components/cn';
 import { toast } from '@/components/toast/toastStore';
-import { unsettledMatchCount } from '@/core/session/finish';
+import { playedRounds, unsettledMatchCount } from '@/core/session/finish';
 import { initialsOf } from '@/core/utils/avatar';
 import { sessionCardData, tierUpCardData } from '@/features/export/cardData';
 import { ExportSheet, TierUpExport } from '@/features/export/ExportSheet';
@@ -218,7 +218,7 @@ export function FinishScreen() {
           ) : (
             <section className="rounded-lg border border-line bg-surface p-4">
               <p className="text-[17px] font-bold">{t('session.finish.readyTitle')}</p>
-              <p className="mt-1 text-[14px] text-ink-muted">{t('session.finish.readyBody', { rounds: rounds.length, players: session.participants.length })}</p>
+              <p className="mt-1 text-[14px] text-ink-muted">{t('session.finish.readyBody', { rounds: playedRounds(rounds).length, players: session.participants.length })}</p>
             </section>
           )}
           <Button size="lg" fullWidth disabled={unsettled > 0} leftIcon={<Flag size={18} aria-hidden="true" />} onClick={() => setConfirm('finish')}>

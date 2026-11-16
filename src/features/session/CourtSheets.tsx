@@ -40,6 +40,7 @@ export function ScoreSheet({ roundId, matchId, onClose }: { roundId: Id; matchId
   const match = useMatch(roundId, matchId);
   const session = useSessionStore((s) => s.session);
   const setScore = useSessionStore((s) => s.setScore);
+  const setFinalScore = useSessionStore((s) => s.setFinalScore);
   const completeMatch = useSessionStore((s) => s.completeMatch);
   const undoLast = useSessionStore((s) => s.undoLast);
   const canUndo = useSessionStore((s) => s.undo.length > 0);
@@ -74,6 +75,17 @@ export function ScoreSheet({ roundId, matchId, onClose }: { roundId: Id; matchId
   const settled = match.status === 'completed' || match.status === 'voided';
 
   const onChange = (c: ScoreChange) => setScore(roundId, matchId, c);
+  // Fixed-sum (padel): one tap on a number IS the final score. No confirm step; undo lives in the toast.
+  const oneTap = view.spec.type === 'fixed_sum';
+  const onSubmit = (c: ScoreChange) => {
+    setFinalScore(roundId, matchId, c);
+    const saved = useSessionStore.getState().rounds.find((r) => r.id === roundId)?.matches.find((m) => m.id === matchId);
+    if (saved?.status !== 'completed') return; // e.g. a tie on an even total: stay open, the blocker below says why
+    haptic('success');
+    const court = session.courts.find((c) => c.id === saved.courtId)?.label ?? '';
+    toast.undo(t('session.court.completedToast', { court }), t('common.undo'), () => undoLast());
+    onClose();
+  };
 
   return (
     <Sheet
@@ -82,6 +94,7 @@ export function ScoreSheet({ roundId, matchId, onClose }: { roundId: Id; matchId
       title={t('session.court.editScore')}
       closeLabel={t('common.close')}
       footer={
+        oneTap ? undefined : (
         <div className="flex gap-2">
           <Button variant="secondary" size="lg" disabled={!canUndo} leftIcon={<Undo2 size={18} aria-hidden="true" />} onClick={() => undoLast()} aria-label={t('common.undo')}>
             {t('common.undo')}
@@ -106,10 +119,20 @@ export function ScoreSheet({ roundId, matchId, onClose }: { roundId: Id; matchId
             </Button>
           )}
         </div>
+        )
       }
     >
       <div className="pb-4 pt-2">
-        <ScorePadHost spec={view.spec} points={match.score.points} teamNames={view.teamNames} winnerTeamIndex={match.score.winnerTeamIndex} disabled={settled} labels={view.labels} onChange={onChange} />
+        <ScorePadHost
+          spec={view.spec}
+          points={match.score.points}
+          teamNames={view.teamNames}
+          winnerTeamIndex={match.score.winnerTeamIndex}
+          disabled={match.status === 'voided' || (settled && !oneTap)}
+          labels={view.labels}
+          onChange={onChange}
+          onSubmit={oneTap ? onSubmit : undefined}
+        />
         {!view.validation.ok ? (
           <ul role="alert" className="mt-4 flex flex-col gap-1">
             {view.validation.errors.map((e) => (
@@ -309,7 +332,7 @@ export function SubstituteSheet({ roundId, playerId, onClose }: { roundId: Id; p
 
   const pick = (inId: Id, add?: ReturnType<typeof participantFromPlayer>) => {
     if (add) addParticipant(add);
-    substitute(playerId, inId);
+    substitute(roundId, playerId, inId);
     haptic('medium');
     toast.success(t('session.court.substituteDone', { out: self ? displayName(self) : '', inn: add ? displayName(add) : displayName(byId.get(inId) ?? { name: '?', nickname: null }) }));
     onClose();

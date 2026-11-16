@@ -7,11 +7,16 @@ import {
   addParticipant,
   allMatchesSettled,
   buildNextRound,
+  buildSchedule,
   canDeactivateCourt,
   completeMatch,
   courtsForRound,
   completionBlocker,
   eligiblePlayerIds,
+  isRoundUntouched,
+  liveRound,
+  plansAllRounds,
+  rebuildUntouched,
   LIMITS,
   removeParticipant,
   resolveMatchShape,
@@ -203,6 +208,61 @@ describe('participants and courts', () => {
     // A court switched on mid-round has no match yet, so it is not shown until a round uses it.
     const small = buildNextRound({ session: off, rounds: [], plugin, seed: 5, uid: 'h', now: 3 });
     expect(courtsForRound(s, small).map((c) => c.id)).toEqual(['c1']);
+  });
+});
+
+describe('pre-built schedule (Americano with a target)', () => {
+  const session = { ...makeSession('padel', 13, 2), targetRounds: 8 };
+  const padel = getSportPlugin('padel');
+  const spec = session.scoreInput;
+  const schedule = buildSchedule({ session, plugin: padel, count: 8, seed: 3, uid: 'h', now: 1 });
+
+  it('only Americano with a target plans every round', () => {
+    expect(plansAllRounds(session)).toBe(true);
+    expect(plansAllRounds({ ...session, targetRounds: null })).toBe(false);
+    expect(plansAllRounds({ ...session, format: 'mexicano' })).toBe(false);
+  });
+
+  it('builds rounds 1..N with fair rests: nobody double-booked, rest counts differ by at most 1, no back-to-back rest', () => {
+    expect(schedule.map((r) => r.roundNumber)).toEqual([1, 2, 3, 4, 5, 6, 7, 8]);
+    const rests: Record<string, number> = {};
+    let prev: string[] = [];
+    for (const r of schedule) {
+      const seen = r.matches.flatMap((m) => m.teams.flat()).concat(r.restingPlayerIds);
+      expect(new Set(seen).size).toBe(13);
+      for (const id of r.restingPlayerIds) {
+        rests[id] = (rests[id] ?? 0) + 1;
+        expect(prev).not.toContain(id);
+      }
+      prev = r.restingPlayerIds;
+    }
+    const counts = session.participants.map((p) => rests[p.playerId] ?? 0);
+    expect(Math.max(...counts) - Math.min(...counts)).toBeLessThanOrEqual(1);
+  });
+
+  it('live round is the first with an open match, and the last one once everything is settled', () => {
+    expect(liveRound(schedule)?.roundNumber).toBe(1);
+    const settle = (r: RoundDoc) => r.matches.reduce((acc, m) => completeMatch(setMatchScore(acc, m.id, { teamIndex: 0, value: 13, mode: 'set' }, padel, spec, 'h', 2), m.id, padel, spec, 'h', 2), r);
+    const firstTwoDone = schedule.map((r) => (r.roundNumber <= 2 ? settle(r) : r));
+    expect(liveRound(firstTwoDone)?.roundNumber).toBe(3);
+    expect(liveRound(schedule.map(settle))?.roundNumber).toBe(8);
+    expect(liveRound([])).toBeUndefined();
+  });
+
+  it('rebuilds untouched rounds from a given round, keeps scored rounds and every id', () => {
+    const started = setMatchScore(schedule[2]!, schedule[2]!.matches[0]!.id, { teamIndex: 0, value: 5, mode: 'set' }, padel, spec, 'h', 2);
+    const rounds = schedule.map((r) => (r.id === started.id ? started : r));
+    const leaving = rounds[4]!.matches[0]!.teams[0]![0]!;
+    const smaller = removeParticipant(session, leaving, 5, 3);
+    const rebuilt = rebuildUntouched({ session: smaller, rounds, fromRound: 2, plugin: padel, seed: 9, uid: 'h', now: 3 });
+    expect(rebuilt.map((r) => r.id)).toEqual(rounds.map((r) => r.id));
+    expect(rebuilt[0]).toBe(rounds[0]); // before fromRound
+    expect(rebuilt[2]).toBe(started); // scored: untouched by the rebuild
+    expect(rebuilt[1]!.revision).toBe(rounds[1]!.revision + 1);
+    for (const r of rebuilt.slice(4)) {
+      expect(r.matches.flatMap((m) => m.teams.flat()).concat(r.restingPlayerIds)).not.toContain(leaving);
+      expect(isRoundUntouched(r)).toBe(true);
+    }
   });
 });
 

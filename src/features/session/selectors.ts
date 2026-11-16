@@ -4,14 +4,9 @@ import { computeStandings } from '@/core/standings/computeStandings';
 import { getSportPlugin } from '@/core/sports/registry';
 import type { StandingRow } from '@/core/matchmaking/types';
 import type { Id } from '@/types/common';
-import type { Match, RoundDoc } from '@/types/round';
+import type { Match } from '@/types/round';
 import type { SessionParticipant } from '@/types/session';
-import { selectCurrentRound, useSessionStore } from '@/state/sessionStore';
-
-/** The current round only; changes when a round is generated or one of its matches is edited. */
-export function useCurrentRound(): RoundDoc | undefined {
-  return useSessionStore(selectCurrentRound);
-}
+import { useSessionStore } from '@/state/sessionStore';
 
 /**
  * One court's match in a given round (the live one, or an earlier round being corrected). The match

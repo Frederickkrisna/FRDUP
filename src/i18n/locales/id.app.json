@@ -303,9 +303,10 @@
       "roundPillLive": "Ronde {{number}}, sedang berjalan",
       "progress": "{{done}}/{{total}} selesai",
       "pastRoundNote": "Ini ronde yang sudah lewat. Skor yang kamu ubah di sini langsung mengubah klasemen.",
-      "backToLive": "Kembali ke Ronde {{number}}",
-      "pickFor": "Ketuk skor {{team}}",
-      "setScore": "Skor {{team}} jadi {{value}}"
+      "pickFor": "Ketuk skor {{team}}, langsung tersimpan",
+      "setScore": "Skor {{team}} jadi {{value}}",
+      "goToRound": "Ke Ronde {{number}}",
+      "roundPillDone": "Ronde {{number}}, selesai"
     },
     "standings": {
       "noDataBody": "Klasemen muncul setelah pertandingan pertama selesai.",

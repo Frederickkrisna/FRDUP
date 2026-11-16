@@ -14,15 +14,20 @@ import type { StandingRow } from '@/core/matchmaking/types';
 import { computeStandings } from '@/core/standings/computeStandings';
 import { applyRp, computeSessionRp, rpToPosition, type RankPosition } from '@/core/ranking/computeRp';
 import { isWithinWeeklyWindow } from '@/core/utils/date';
-import { SCHEMA_VERSION, isMatchSettled } from './sessionEngine';
+import { SCHEMA_VERSION, isMatchSettled, isRoundUntouched } from './sessionEngine';
 
 const DAY_MS = 86_400_000;
 
 /** RP gate: fewer matches than this in a session never moves the ladder. */
 export const MIN_MATCHES_GATE = 3;
 
+/** Rounds that count for a finish. Untouched ones (never started) are dropped when the session ends. */
+export function playedRounds(rounds: RoundDoc[]): RoundDoc[] {
+  return rounds.filter((r) => !isRoundUntouched(r));
+}
+
 export function unsettledMatchCount(rounds: RoundDoc[]): number {
-  return rounds.reduce((n, r) => n + r.matches.filter((m) => !isMatchSettled(m)).length, 0);
+  return playedRounds(rounds).reduce((n, r) => n + r.matches.filter((m) => !isMatchSettled(m)).length, 0);
 }
 
 export function emptyStats(playerId: Id, sportId: SessionDoc['sportId'], now: Millis): PlayerSportStatsDoc {

@@ -9,6 +9,7 @@ import { ScreenHeader } from '@/components/ScreenHeader';
 import { Button } from '@/components/Button';
 import { getSportPlugin } from '@/core/sports/registry';
 import { formatElapsed } from '@/core/utils/date';
+import { SessionSyncStatus } from '@/features/session/SessionSyncStatus';
 import { SessionToolsSheet } from '@/features/session/SessionToolsSheet';
 import { useWakeLock } from '@/features/session/useWakeLock';
 import { sportAccent } from '@/features/shared/sportMeta';
@@ -77,6 +78,7 @@ export function SessionLayout() {
         accent={sportAccent(active.sportId)}
         onBack={() => void navigate('/home')}
         backLabel={t('session.header.leave')}
+        below={<SessionSyncStatus />}
         right={
           <>
             {role === 'host' && live ? (

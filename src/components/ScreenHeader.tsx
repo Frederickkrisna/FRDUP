@@ -10,11 +10,13 @@ type Props = {
   right?: ReactNode;
   /** Sport tint for session screens, as a CSS colour reference. */
   accent?: string;
+  /** A thin row inside the sticky header (e.g. sync status), so it never scrolls away. */
+  below?: ReactNode;
   className?: string;
 };
 
 /** App-style top bar: respects the notch, 56px, title left, one-handed back target. */
-export function ScreenHeader({ title, subtitle, onBack, backLabel, right, accent, className }: Props) {
+export function ScreenHeader({ title, subtitle, onBack, backLabel, right, accent, below, className }: Props) {
   return (
     <header className={cn('pt-safe sticky top-0 z-20 border-b border-line bg-bg/95 backdrop-blur-sm', className)}>
       <div className="mx-auto flex min-h-14 w-full max-w-[560px] items-center gap-1 px-2">
@@ -36,6 +38,7 @@ export function ScreenHeader({ title, subtitle, onBack, backLabel, right, accent
         </div>
         {right ? <div className="flex shrink-0 items-center gap-1 pr-2">{right}</div> : null}
       </div>
+      {below}
     </header>
   );
 }

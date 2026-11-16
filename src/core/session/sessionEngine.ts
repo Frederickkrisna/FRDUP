@@ -133,6 +133,53 @@ export function allMatchesSettled(round: RoundDoc): boolean {
   return round.matches.length > 0 && round.matches.every(isMatchSettled);
 }
 
+/** Nothing on this round has been scored yet: it can still be rebuilt, or dropped at finish. */
+export function isRoundUntouched(round: RoundDoc): boolean {
+  return round.matches.every((m) => m.status === 'scheduled');
+}
+
+/** The round being played: the first one with an open match, or the last one once all are settled. */
+export function liveRound(rounds: RoundDoc[]): RoundDoc | undefined {
+  let live: RoundDoc | undefined;
+  let last: RoundDoc | undefined;
+  for (const r of rounds) {
+    if (!last || r.roundNumber > last.roundNumber) last = r;
+    if (!allMatchesSettled(r) && (!live || r.roundNumber < live.roundNumber)) live = r;
+  }
+  return live ?? last;
+}
+
+/** Americano with a target builds the whole schedule up front. Mexicano pairs on results, so it cannot. */
+export function plansAllRounds(session: SessionDoc): boolean {
+  return session.format === 'americano' && session.targetRounds !== null;
+}
+
+/** Rounds 1..count in one go, each one seeing the earlier ones as history (fair rests and pairings). */
+export function buildSchedule({ session, plugin, count, seed, uid, now }: Omit<BuildNextRoundArgs, 'rounds'> & { count: number }): RoundDoc[] {
+  const rounds: RoundDoc[] = [];
+  for (let i = 0; i < count; i++) rounds.push(buildNextRound({ session, rounds, plugin, seed: (seed + i) >>> 0, uid, now }));
+  return rounds;
+}
+
+/**
+ * Rebuilds every untouched round from `fromRound` on, in order, after the roster, courts or a bench
+ * swap changed. Scored rounds stay as they are. Ids survive, so open screens and the replica keep
+ * pointing at the same documents. Throws InsufficientPlayersError like buildNextRound.
+ */
+export function rebuildUntouched({ session, rounds, fromRound, plugin, seed, uid, now }: BuildNextRoundArgs & { fromRound: number }): RoundDoc[] {
+  const out: RoundDoc[] = [];
+  for (const r of [...rounds].sort((a, b) => a.roundNumber - b.roundNumber)) {
+    if (r.roundNumber < fromRound || !isRoundUntouched(r)) {
+      out.push(r);
+      continue;
+    }
+    // Earlier rounds are contiguous, so buildNextRound numbers this one r.roundNumber.
+    const fresh = buildNextRound({ session, rounds: out, plugin, seed: (seed + r.roundNumber) >>> 0, uid, now });
+    out.push({ ...fresh, id: r.id, createdAt: r.createdAt, revision: r.revision + 1 });
+  }
+  return out;
+}
+
 export function deriveRoundStatus(round: RoundDoc, now: Millis): Pick<RoundDoc, 'status' | 'completedAt'> {
   if (allMatchesSettled(round)) return { status: 'completed', completedAt: round.completedAt ?? now };
   return { status: round.status === 'completed' ? 'in_progress' : round.status, completedAt: null };

@@ -2,9 +2,15 @@ import AxeBuilder from '@axe-core/playwright';
 import { expect, test, type Page } from '@playwright/test';
 import { onboard, startBadmintonSession, tapPlus } from './helpers';
 
-/** Entry animations are mid-flight otherwise and axe samples half-transparent text. */
+/**
+ * Entry animations are mid-flight otherwise and axe samples half-transparent text. Polls, because
+ * late-mounting elements (the iOS install hint on WebKit) start their entrance after a first wait.
+ */
 async function settle(page: Page) {
-  await page.evaluate(() => Promise.all(document.getAnimations().filter((a) => (a.effect?.getComputedTiming().iterations ?? 1) !== Infinity).map((a) => a.finished.catch(() => undefined))));
+  await expect
+    .poll(() => page.evaluate(() => document.getAnimations().filter((a) => a.playState === 'running' && (a.effect?.getComputedTiming().iterations ?? 1) !== Infinity).length), { timeout: 5_000 })
+    .toBe(0);
+  await page.waitForTimeout(100); // one more frame for anything mounted by the last animation's end
 }
 
 async function audit(page: Page, label: string) {

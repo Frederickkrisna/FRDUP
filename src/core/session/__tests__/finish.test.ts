@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { getSportPlugin } from '@/core/sports/registry';
 import type { RoundDoc } from '@/types/round';
 import type { PlayerSportStatsDoc } from '@/types/player';
-import { buildFinish, emptyStats, nextStreak, revertStats, unsettledMatchCount } from '../finish';
+import { buildFinish, emptyStats, nextStreak, playedRounds, revertStats, unsettledMatchCount } from '../finish';
 import { buildNextRound, completeMatch, setMatchScore } from '../sessionEngine';
 import { makeSession } from './helpers';
 
@@ -44,10 +44,14 @@ describe('nextStreak', () => {
 });
 
 describe('buildFinish', () => {
-  it('counts unsettled matches', () => {
+  it('counts unsettled matches of started rounds; never-started rounds are dropped, not counted', () => {
     const session = makeSession('badminton', 9, 2);
     const r = buildNextRound({ session, rounds: [], plugin, seed: 1, uid: 'h', now: 1 });
-    expect(unsettledMatchCount([r])).toBe(2);
+    expect(unsettledMatchCount([r])).toBe(0); // untouched: dropped at finish
+    expect(playedRounds([r])).toEqual([]);
+    const started = setMatchScore(r, r.matches[0]!.id, { teamIndex: 0, value: 3, mode: 'set' }, plugin, session.scoreInput, 'h', 2);
+    expect(unsettledMatchCount([started])).toBe(2);
+    expect(playedRounds([started, buildNextRound({ session, rounds: [started], plugin, seed: 2, uid: 'h', now: 3 })])).toEqual([started]);
   });
 
   it('commits a full session: every player who played gets a result, RP within bounds', () => {
