@@ -140,7 +140,8 @@
     "empty": {
       "title": "Belum ada peringkat",
       "body": "Peringkat muncul setelah ada sesi selesai untuk olahraga ini."
-    }
+    },
+    "rpUnit": "RP"
   },
   "settings": {
     "profile": "Profil",
@@ -198,7 +199,7 @@
     "tools": {
       "title": "Alat sesi",
       "courts": "Lapangan",
-      "courtsHint": "Matikan lapangan yang tidak dipakai. Berlaku mulai ronde berikutnya.",
+      "courtsHint": "Lapangan yang dimatikan tidak dipakai lagi. Kalau ronde ini belum mulai, langsung diacak ulang; kalau sudah jalan, berlaku mulai ronde berikutnya.",
       "courtActive": "Pakai {{court}}",
       "players_other": "Pemain ({{count}})",
       "addPlayer": "Tambah",
@@ -209,7 +210,14 @@
       "finish": "Selesaikan sesi",
       "abandon": "Batalkan sesi",
       "abandonConfirm": "Batalkan sesi ini?",
-      "abandonDetail": "Sesi dibatalkan tanpa menghitung peringkat. Skor yang sudah dicatat tidak ikut dihitung."
+      "abandonDetail": "Sesi dibatalkan tanpa menghitung peringkat. Skor yang sudah dicatat tidak ikut dihitung.",
+      "courtOn": "Dipakai",
+      "courtOff": "Tidak dipakai",
+      "lastCourt": "Minimal satu lapangan harus tetap aktif.",
+      "courtOnNow": "{{court}} dipakai. Ronde ini sudah diacak ulang.",
+      "courtOnNext": "{{court}} dipakai mulai ronde berikutnya.",
+      "courtOffNow": "{{court}} dimatikan. Ronde ini sudah diacak ulang.",
+      "courtOffNext": "{{court}} dimatikan mulai ronde berikutnya. Selesaikan dulu pertandingan yang sedang jalan di sana."
     },
     "setup": {
       "addGuestCta": "Tambah dan pilih",
@@ -279,7 +287,18 @@
         "limit": "Sudah mencapai batas 200 ronde.",
         "no_session": "Tidak ada sesi aktif.",
         "readonly": "Hanya host yang bisa membuat ronde baru."
-      }
+      },
+      "retiring": "Lapangan ini sudah dimatikan. Selesaikan atau batalkan pertandingan ini; ronde berikutnya tidak memakai lapangan ini.",
+      "retiringDone": "Lapangan ini sudah dimatikan dan tidak dipakai di ronde berikutnya.",
+      "benchPlayIn": "{{name}} main sekarang, gantikan pemain di lapangan",
+      "benchHint": "Ada yang ke toilet atau belum siap? Ketuk nama yang istirahat untuk main duluan. Yang digantikan otomatis main di ronde berikutnya.",
+      "pickSwapTitle": "Siapa yang ditukar?",
+      "pickSubTitle": "Siapa yang diganti?",
+      "teamN": "Tim {{n}}",
+      "benchPlaysNow": "Istirahat · main sekarang",
+      "playInsteadOf": "{{name}} main gantikan…",
+      "noBenchHint": "Tidak ada yang istirahat ronde ini. Tukar dengan pemain di lapangan lain, atau tunggu dia kembali.",
+      "benchSwapDone": "{{inn}} main sekarang. {{out}} istirahat dan main di ronde berikutnya."
     },
     "standings": {
       "noDataBody": "Klasemen muncul setelah pertandingan pertama selesai.",
@@ -289,7 +308,10 @@
       "pointsFull": "Urutkan berdasarkan poin",
       "diffFull": "Urutkan berdasarkan selisih",
       "projected": "perkiraan {{delta}} RP",
-      "projectedHint": "RP di sini hanya perkiraan dan bisa berubah sampai sesi selesai."
+      "projectedHint": "RP di sini hanya perkiraan dan bisa berubah sampai sesi selesai.",
+      "playedShort": "Main",
+      "record": "M-K",
+      "recordDraws": "M-K-S"
     },
     "rounds": {
       "empty": "Belum ada ronde",
@@ -376,7 +398,7 @@
     "noCode": "Belum ada kode aktif",
     "noCodeBody": "Buat kode supaya perangkat lain bisa bergabung.",
     "needsOnline": "Perlu internet untuk membuat kode dan bergabung.",
-    "issueFailed": "Kode gagal dibuat. Coba lagi.",
+    "issueFailed": "Kode gagal dibuat. Cek internet lalu coba lagi.",
     "shareText": "Gabung sesi FRDUP kami. Kode: {{code}}",
     "noDevices": "Belum ada perangkat yang bergabung.",
     "online": "Aktif",
@@ -391,6 +413,12 @@
     "deviceName": "Nama perangkat",
     "deviceNameHint": "Host melihat nama ini saat kamu bergabung.",
     "ownSessionWarning": "Kamu sedang menjalankan sesi sendiri. Bergabung ke sesi lain akan menggantikannya di perangkat ini.",
-    "joinCta": "Gabung"
+    "joinCta": "Gabung",
+    "shareQr": "Bagikan QR & tautan",
+    "shareCopied": "Tautan disalin. Tempel di WhatsApp.",
+    "saveQr": "Simpan QR",
+    "qrSaved": "Gambar QR tersimpan.",
+    "qrSaveFailed": "Gambar QR gagal dibuat.",
+    "loopbackWarning": "QR ini mengarah ke localhost, jadi HP lain tidak bisa membukanya. Buka aplikasi dari alamat hosting atau IP jaringan (npm run dev -- --host), atau isi VITE_PUBLIC_ORIGIN."
   }
 }

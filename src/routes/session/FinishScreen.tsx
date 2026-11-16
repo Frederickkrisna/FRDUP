@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react';
-import { ArrowRight, ChevronDown, Flag, Pencil, Share2 } from 'lucide-react';
+import { ArrowRight, ChevronDown, Flag, Link2, Pencil, Share2 } from 'lucide-react';
 import { useNavigate, useParams } from 'react-router';
 import { useTranslation } from 'react-i18next';
 
@@ -22,6 +22,9 @@ import { useStandings } from '@/features/session/selectors';
 import { useAppStore } from '@/state/appStore';
 import { useSessionStore } from '@/state/sessionStore';
 import { flushNow } from '@/state/sync';
+import { publicBoardRepo } from '@/data/publicBoardRepo';
+import { publicUrl } from '@/features/shared/publicUrl';
+import type { BoardEntry } from '@/types/publicBoard';
 import type { RankChange } from '@/core/session/finish';
 
 export function FinishScreen() {
@@ -47,6 +50,8 @@ export function FinishScreen() {
   const [qIndex, setQIndex] = useState(0);
   const [shareBoard, setShareBoard] = useState(false);
   const [shareTier, setShareTier] = useState<RankChange | null>(null);
+  const [sharingPublic, setSharingPublic] = useState(false);
+  const [publicBoardId, setPublicBoardId] = useState<string | null>(null);
 
   const unsettled = unsettledMatchCount(rounds);
   const done = session?.rankingApplied === true;
@@ -95,6 +100,67 @@ export function FinishScreen() {
     await flushNow();
     leave();
     void navigate('/home', { replace: true });
+  };
+
+  const handleSharePublicLink = async () => {
+    if (!session || !finish) return;
+    setSharingPublic(true);
+    try {
+      let bId = publicBoardId;
+      if (!bId) {
+        const entries: BoardEntry[] = finish.standings.map((s) => {
+          const p = byId.get(s.playerId);
+          const change = finish.changes.find((c) => c.playerId === s.playerId);
+          return {
+            playerId: s.playerId,
+            name: p ? displayName(p) : '?',
+            nickname: p?.nickname ?? null,
+            avatarColor: p?.avatarColor ?? 'transparent',
+            rank: s.rank,
+            matchesPlayed: s.matchesPlayed,
+            wins: s.wins,
+            pointsFor: s.pointsFor,
+            pointsAgainst: s.pointsAgainst,
+            pointDiff: s.pointDiff,
+            winRate: s.winRate,
+            rpDelta: change?.delta ?? 0,
+            tierAfter: change?.to.tier ?? 'warrior',
+            divisionAfter: change?.to.division ?? 1,
+          };
+        });
+
+        bId = publicBoardRepo.publish({
+          hostId: session.hostId,
+          sessionId: session.id,
+          sportId: session.sportId,
+          title: session.title,
+          venue: session.venue,
+          playedAt: session.playedAt,
+          entries,
+        });
+        setPublicBoardId(bId);
+      }
+
+      const shareUrl = publicUrl(`/board/${bId}`);
+      if (navigator.share) {
+        try {
+          await navigator.share({
+            title: session.title || t('session.finish.shareLinkTitle'),
+            url: shareUrl,
+          });
+          toast.success(t('session.finish.linkShared'));
+          return;
+        } catch (e) {
+          if ((e as Error).name === 'AbortError') return;
+        }
+      }
+      await navigator.clipboard.writeText(shareUrl);
+      toast.success(t('session.finish.linkCopied'));
+    } catch {
+      toast.danger(t('session.finish.shareFailed'));
+    } finally {
+      setSharingPublic(false);
+    }
   };
 
   const current = queue[qIndex] ?? null;
@@ -196,7 +262,7 @@ export function FinishScreen() {
                             </p>
                           ) : null}
                         </div>
-                        <span className={cn('num text-[16px] font-bold', c.delta > 0 ? 'text-success' : c.delta < 0 ? 'text-danger' : 'text-ink-muted')}>
+                        <span className={cn('num shrink-0 text-[16px] font-bold', c.delta > 0 ? 'text-success' : c.delta < 0 ? 'text-danger' : 'text-ink-muted')}>
                           {c.delta > 0 ? `+${c.delta}` : c.delta === 0 ? t('session.finish.noChange') : c.delta}
                         </span>
                         <TierBadge tier={c.to.tier} division={c.to.division} size="sm" />
@@ -227,6 +293,17 @@ export function FinishScreen() {
           <section className="flex flex-col gap-2">
             <Button size="lg" fullWidth leftIcon={<Share2 size={18} aria-hidden="true" />} disabled={!board || board.entries.length === 0} onClick={() => setShareBoard(true)}>
               {t('session.finish.shareBoard')}
+            </Button>
+            <Button
+              size="lg"
+              fullWidth
+              variant="secondary"
+              leftIcon={<Link2 size={18} aria-hidden="true" />}
+              loading={sharingPublic}
+              disabled={!finish || finish.standings.length === 0}
+              onClick={() => void handleSharePublicLink()}
+            >
+              {t('session.finish.shareLink')}
             </Button>
             <Button size="lg" fullWidth variant="secondary" leftIcon={<ArrowRight size={18} aria-hidden="true" />} onClick={() => void navigate(`/session/${session.id}/bill`)}>
               {t('session.finish.continueToBill')}

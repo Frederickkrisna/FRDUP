@@ -7,7 +7,7 @@ import { Button } from '@/components/Button';
 import { Chip } from '@/components/Chip';
 import { haptic } from '@/components/haptics';
 import { toast } from '@/components/toast/toastStore';
-import { allMatchesSettled } from '@/core/session/sessionEngine';
+import { allMatchesSettled, courtsForRound } from '@/core/session/sessionEngine';
 import { CourtCard } from '@/features/session/CourtCard';
 import { CourtSheets, type CourtSheetState } from '@/features/session/CourtSheets';
 import { RestingBench } from '@/features/session/RestingBench';
@@ -79,7 +79,8 @@ export function CourtsScreen() {
   const settled = allMatchesSettled(round);
   const reachedTarget = session.targetRounds !== null && round.roundNumber >= session.targetRounds;
   const untouched = round.matches.every((m) => m.status === 'scheduled');
-  const activeCourts = session.courts.filter((c) => c.isActive && round.matches.some((m) => m.courtId === c.id));
+  // Courts with a match this round, including one switched off mid-round (its match must still settle).
+  const roundCourts = courtsForRound(session, round);
 
   const next = () => {
     const res = generateNextRound();
@@ -116,12 +117,12 @@ export function CourtsScreen() {
       </div>
 
       <div key={round.id} className="flex flex-col gap-3">
-        {activeCourts.map((court, i) => (
-          <CourtCard key={court.id} court={court} index={i} locked={role === 'cohost' && !claimed.includes(court.id)} onOpenScore={openScore} onOpenMenu={openMenu} onLongPressPlayer={longPress} />
+        {roundCourts.map(({ retiring, ...court }, i) => (
+          <CourtCard key={court.id} court={court} index={i} retiring={retiring} locked={role === 'cohost' && !claimed.includes(court.id)} onOpenScore={openScore} onOpenMenu={openMenu} onLongPressPlayer={longPress} />
         ))}
       </div>
 
-      <RestingBench ids={round.restingPlayerIds} />
+      <RestingBench ids={round.restingPlayerIds} onPick={role === 'host' && !settled ? (playerId) => setSheet({ kind: 'swap', roundId: round.id, playerId }) : undefined} />
 
       {role === 'host' ? (
         <div className="fixed inset-x-0 z-20 mx-auto max-w-[560px] px-4" style={{ bottom: 'calc(var(--tabbar-h) + var(--safe-bottom) + 12px)' }}>

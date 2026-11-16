@@ -291,6 +291,22 @@ export function setCourtActive(session: SessionDoc, courtId: Id, active: boolean
   return { ...session, courts, updatedAt: now };
 }
 
+/** At least one court must stay on, or no round can ever be generated. */
+export function canDeactivateCourt(session: SessionDoc, courtId: Id): boolean {
+  const target = session.courts.find((c) => c.id === courtId);
+  if (!target?.isActive) return true;
+  return session.courts.filter((c) => c.isActive).length > 1;
+}
+
+/**
+ * Courts the live screen shows for a round: every court that holds a match in this round (even
+ * if it was switched off mid-round, so its match can still be finished or voided), in court order.
+ */
+export function courtsForRound(session: SessionDoc, round: RoundDoc): Array<CourtDef & { retiring: boolean }> {
+  const used = new Set(round.matches.map((m) => m.courtId));
+  return session.courts.filter((c) => used.has(c.id)).map((c) => ({ ...c, retiring: !c.isActive }));
+}
+
 /** Players currently playing in a round, used to validate swaps/substitutions. */
 export function playersInRound(round: RoundDoc): Id[] {
   return [...round.matches.flatMap((m) => m.teams.flat()), ...round.restingPlayerIds];

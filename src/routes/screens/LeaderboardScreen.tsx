@@ -92,19 +92,20 @@ export function LeaderboardScreen() {
                 const winRate = Math.round(r.winRate * 100);
                 return (
                   <li key={r.playerId} className="[content-visibility:auto] [contain-intrinsic-size:auto_64px]">
-                    <Link to={`/roster/${r.playerId}`} className="pressable pressable-hover flex min-h-16 items-center gap-3 rounded-lg px-2 py-2">
-                      <span className="num w-7 shrink-0 text-center text-[17px] font-bold text-ink-muted">{r.rank}</span>
+                    <Link to={`/roster/${r.playerId}`} className="pressable pressable-hover flex min-h-16 items-center gap-2.5 rounded-lg px-1.5 py-2">
+                      <span className="num w-6 shrink-0 text-center text-[16px] font-bold text-ink-muted">{r.rank}</span>
                       <Avatar name={r.name} initials={initialsOf(r.name)} color={r.avatarColor} src={r.avatarUrl} size="sm" />
                       <div className="min-w-0 flex-1">
                         <p className="truncate text-[16px] font-semibold leading-tight">{r.nickname || r.name}</p>
-                        <p className="num truncate text-[12px] text-ink-muted">
+                        <p className="num mt-0.5 truncate text-[12px] text-ink-muted">
                           {t('board.stats', { wins, losses, winRate, matches })}
                         </p>
                       </div>
-                      <div className="flex items-center gap-2">
+                      <div className="flex shrink-0 flex-col items-end leading-none">
                         <span className="num text-[15px] font-bold">{num.format(r.summary.rp)}</span>
-                        <TierBadge tier={r.summary.tier} division={r.summary.division} stars={r.summary.stars} size="sm" />
+                        <span className="mt-1 text-[11px] font-semibold text-ink-faint">{t('board.rpUnit')}</span>
                       </div>
+                      <TierBadge tier={r.summary.tier} division={r.summary.division} stars={r.summary.stars} size="sm" />
                     </Link>
                   </li>
                 );

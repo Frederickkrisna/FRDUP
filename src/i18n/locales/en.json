@@ -212,7 +212,12 @@
       "skipAll": "Skip all",
       "continueToBill": "Continue to Bill",
       "sessionAlreadyCommitted": "This session has already been committed",
-      "playerStats": "{{points}} Pts · {{wins}}W-{{losses}}L"
+      "playerStats": "{{points}} Pts · {{wins}}W-{{losses}}L",
+      "shareLink": "Share Web Link",
+      "shareLinkTitle": "FRDUP Session Standings",
+      "linkCopied": "Leaderboard link copied!",
+      "linkShared": "Leaderboard link shared successfully!",
+      "shareFailed": "Failed to share link"
     }
   },
   "bill": {
@@ -248,10 +253,10 @@
     "shareWhatsapp": "Send via WhatsApp",
     "exportImage": "Save as Image",
     "rounding": {
-      "title": "Rounding",
       "100": "To nearest Rp 100",
       "500": "To nearest Rp 500",
-      "1000": "To nearest Rp 1,000"
+      "1000": "To nearest Rp 1,000",
+      "title": "Rounding"
     },
     "error": {
       "noPayers": "Select at least 1 player for this item"
@@ -395,7 +400,20 @@
       "body": "Complete a session to start tracking player ranks and performance."
     },
     "rankLabel": "Rank {{rank}}",
-    "stats": "W-L-T: {{wins}}-{{losses}}-0 · WR: {{winRate}}% · {{matches}}M"
+    "stats": "{{wins}}W {{losses}}L · {{winRate}}% wins · {{matches}} played",
+    "public": {
+      "title": "Session Standings",
+      "subtitle": "Match results summary",
+      "shareText": "Check out the {{sport}} session standings on FRDUP!",
+      "notFoundTitle": "Leaderboard Not Found",
+      "notFoundBody": "This link may have expired (30 days) or the ID is invalid.",
+      "expiresNotice": "Link valid for 30 days",
+      "createSession": "Play on FRDUP",
+      "tagline": "Casual scoring & ranking app for sports communities",
+      "shareAction": "Share Link",
+      "copied": "Link copied to clipboard"
+    },
+    "rpUnit": "RP"
   },
   "sync": {
     "idle": "Synced",

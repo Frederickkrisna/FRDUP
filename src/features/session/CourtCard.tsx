@@ -22,6 +22,8 @@ type Props = {
   onOpenMenu: (roundId: string, matchId: string) => void;
   onLongPressPlayer: (roundId: string, playerId: string) => void;
   index: number;
+  /** Switched off mid-round: this match still has to be finished or voided, then the court is gone. */
+  retiring?: boolean;
 };
 
 const LONG_PRESS_MS = 450;
@@ -30,7 +32,7 @@ const LONG_PRESS_MS = 450;
  * One court. Subscribes to its OWN match only (see selectors.useCourtMatch), so scoring on court 1
  * never re-renders court 2. 64px increment targets, tabular numerals, undo instead of confirmation.
  */
-export const CourtCard = memo(function CourtCard({ court, locked, onOpenScore, onOpenMenu, onLongPressPlayer, index }: Props) {
+export const CourtCard = memo(function CourtCard({ court, locked, onOpenScore, onOpenMenu, onLongPressPlayer, index, retiring = false }: Props) {
   const { t } = useTranslation();
   const found = useCourtMatch(court.id);
   const byId = useParticipantMap();
@@ -115,6 +117,12 @@ export const CourtCard = memo(function CourtCard({ court, locked, onOpenScore, o
           ) : null}
         </div>
       </header>
+
+      {retiring ? (
+        <p role="note" className="-mt-1 mb-3 rounded-md border border-warning/60 px-3 py-2 text-[13px] text-warning">
+          {settled ? t('session.court.retiringDone') : t('session.court.retiring')}
+        </p>
+      ) : null}
 
       <div className="grid grid-cols-2 gap-x-3 gap-y-4">
         {teams.map((ids, i) => {

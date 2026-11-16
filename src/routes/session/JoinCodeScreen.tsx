@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
-import { Link2, RefreshCw, Share2, Smartphone, WifiOff } from 'lucide-react';
-import { QRCodeSVG } from 'qrcode.react';
+import { Download, Link2, RefreshCw, Share2, Smartphone, TriangleAlert, WifiOff } from 'lucide-react';
+import { QRCodeCanvas, QRCodeSVG } from 'qrcode.react';
 import { useNavigate, useParams } from 'react-router';
 import { useTranslation } from 'react-i18next';
 
@@ -12,6 +12,8 @@ import { cn } from '@/components/cn';
 import { isJoinCodeLive } from '@/core/session/joinCode';
 import { sessionRepo } from '@/data/sessionRepo';
 import { copyText } from '@/features/billing/billExport';
+import { downloadJoinQr, joinQrFilename, joinQrPng, shareJoin } from '@/features/session/joinQr';
+import { isLoopbackOrigin, publicUrl } from '@/features/shared/publicUrl';
 import { useNow } from '@/features/shared/useNow';
 import { useBootStore } from '@/state/bootStore';
 import { useSessionStore } from '@/state/sessionStore';
@@ -39,7 +41,9 @@ export function JoinCodeScreen() {
   const online = useSyncStore((s) => s.online);
   const coHosts = useSyncStore((s) => s.coHosts);
   const [busy, setBusy] = useState(false);
+  const [sharing, setSharing] = useState(false);
   const issued = useRef(false);
+  const qrCanvas = useRef<HTMLCanvasElement>(null);
 
   const active = session?.id === sessionId ? session : null;
   const now = useNow(1000);
@@ -72,22 +76,32 @@ export function JoinCodeScreen() {
   }
 
   const code = live ? active.joinCode : null;
-  const link = code ? `${window.location.origin}/join/${code}` : '';
+  const link = code ? publicUrl(`/join/${code}`) : '';
+  const loopback = isLoopbackOrigin();
+
+  const qrImage = async (): Promise<Blob | null> => (qrCanvas.current && code ? joinQrPng(qrCanvas.current, code) : null);
 
   const share = async () => {
     if (!code) return;
-    const text = t('cohost.shareText', { code });
-    if (typeof navigator.share === 'function') {
-      try {
-        await navigator.share({ title: t('common.appName'), text, url: link });
-        return;
-      } catch (error) {
-        if ((error as { name?: string }).name === 'AbortError') return;
-      }
+    setSharing(true);
+    try {
+      const outcome = await shareJoin({ title: t('common.appName'), text: t('cohost.shareText', { code }), link, image: await qrImage(), filename: joinQrFilename(code) });
+      if (outcome === 'copied') toast.success(t('cohost.shareCopied'));
+      else if (outcome === 'failed') toast.danger(t('bill.copyFailed'));
+    } finally {
+      setSharing(false);
     }
-    const ok = await copyText(`${text}\n${link}`);
-    if (ok) toast.success(t('common.copied'));
-    else toast.danger(t('bill.copyFailed'));
+  };
+
+  const saveQr = async () => {
+    if (!code) return;
+    const image = await qrImage();
+    if (!image) {
+      toast.danger(t('cohost.qrSaveFailed'));
+      return;
+    }
+    downloadJoinQr(image, joinQrFilename(code));
+    toast.success(t('cohost.qrSaved'));
   };
 
   return (
@@ -102,6 +116,13 @@ export function JoinCodeScreen() {
           </p>
         ) : null}
 
+        {code && loopback ? (
+          <p role="alert" className="flex items-start gap-2 rounded-md border border-warning/60 bg-surface p-3 text-[14px] text-warning">
+            <TriangleAlert size={18} className="mt-0.5 shrink-0" aria-hidden="true" />
+            {t('cohost.loopbackWarning')}
+          </p>
+        ) : null}
+
         {code ? (
           <>
             <div className="text-center">
@@ -113,22 +134,31 @@ export function JoinCodeScreen() {
             </div>
 
             <div className="rounded-lg bg-white p-4" role="img" aria-label={t('cohost.qrAlt', { code })}>
-              <QRCodeSVG value={link} size={208} level="M" marginSize={0} />
+              <QRCodeSVG value={link} size={208} level="M" marginSize={1} />
             </div>
+            {/* Hi-res copy for the shared/saved image; never shown. */}
+            <QRCodeCanvas ref={qrCanvas} value={link} size={720} level="M" marginSize={0} className="hidden" aria-hidden="true" />
             <p className="max-w-[28ch] text-center text-[13px] text-ink-muted">{t('cohost.qrHint')}</p>
 
             <div className="flex w-full flex-col gap-2">
-              <Button size="lg" fullWidth leftIcon={<Share2 size={18} aria-hidden="true" />} onClick={() => void share()}>
-                {t('cohost.shareLink')}
+              <Button size="lg" fullWidth loading={sharing} leftIcon={<Share2 size={18} aria-hidden="true" />} onClick={() => void share()}>
+                {t('cohost.shareQr')}
               </Button>
               <div className="grid grid-cols-2 gap-2">
-                <Button variant="secondary" leftIcon={<Link2 size={16} aria-hidden="true" />} onClick={() => void copyText(link).then(() => toast.success(t('common.copied')))}>
+                <Button
+                  variant="secondary"
+                  leftIcon={<Link2 size={16} aria-hidden="true" />}
+                  onClick={() => void copyText(link).then((ok) => (ok ? toast.success(t('common.copied')) : toast.danger(t('bill.copyFailed'))))}
+                >
                   {t('cohost.copyLink')}
                 </Button>
-                <Button variant="secondary" loading={busy} leftIcon={<RefreshCw size={16} aria-hidden="true" />} onClick={() => void issue()}>
-                  {t('cohost.renewCode')}
+                <Button variant="secondary" leftIcon={<Download size={16} aria-hidden="true" />} onClick={() => void saveQr()}>
+                  {t('cohost.saveQr')}
                 </Button>
               </div>
+              <Button variant="secondary" loading={busy} leftIcon={<RefreshCw size={16} aria-hidden="true" />} onClick={() => void issue()}>
+                {t('cohost.renewCode')}
+              </Button>
               <Button
                 variant="ghost"
                 className="text-danger"

@@ -7,7 +7,9 @@ import {
   addParticipant,
   allMatchesSettled,
   buildNextRound,
+  canDeactivateCourt,
   completeMatch,
+  courtsForRound,
   completionBlocker,
   eligiblePlayerIds,
   LIMITS,
@@ -179,6 +181,28 @@ describe('participants and courts', () => {
     const round = buildNextRound({ session: off, rounds: [], plugin, seed: 5, uid: 'h', now: 1 });
     expect(round.matches).toHaveLength(1);
     expect(round.restingPlayerIds).toHaveLength(4);
+  });
+
+  it('never lets the last active court be switched off', () => {
+    const s = makeSession('badminton', 8, 2);
+    expect(canDeactivateCourt(s, 'c1')).toBe(true);
+    const one = setCourtActive(s, 'c2', false, 1);
+    expect(canDeactivateCourt(one, 'c1')).toBe(false);
+    expect(canDeactivateCourt(one, 'c2')).toBe(true); // already off: no-op is fine
+    expect(canDeactivateCourt(one, 'missing')).toBe(true);
+  });
+
+  it('keeps a court switched off mid-round on screen until its match settles', () => {
+    const s = makeSession('badminton', 8, 2);
+    const round = buildNextRound({ session: s, rounds: [], plugin, seed: 5, uid: 'h', now: 1 });
+    const off = setCourtActive(s, 'c2', false, 2);
+    const shown = courtsForRound(off, round);
+    expect(shown.map((c) => c.id)).toEqual(['c1', 'c2']);
+    expect(shown.find((c) => c.id === 'c2')!.retiring).toBe(true);
+    expect(shown.find((c) => c.id === 'c1')!.retiring).toBe(false);
+    // A court switched on mid-round has no match yet, so it is not shown until a round uses it.
+    const small = buildNextRound({ session: off, rounds: [], plugin, seed: 5, uid: 'h', now: 3 });
+    expect(courtsForRound(s, small).map((c) => c.id)).toEqual(['c1']);
   });
 });
 

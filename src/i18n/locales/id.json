@@ -214,7 +214,12 @@
       "skipAll": "Lewati semua",
       "continueToBill": "Lanjut ke Tagihan",
       "sessionAlreadyCommitted": "Sesi ini sudah diselesaikan",
-      "playerStats": "{{points}} Poin · {{wins}}M-{{losses}}K"
+      "playerStats": "{{points}} Poin · {{wins}}M-{{losses}}K",
+      "shareLink": "Bagikan Link Web",
+      "shareLinkTitle": "Klasemen Sesi FRDUP",
+      "linkCopied": "Link klasemen berhasil disalin!",
+      "linkShared": "Link klasemen berhasil dibagikan!",
+      "shareFailed": "Gagal membagikan link"
     }
   },
   "bill": {
@@ -250,10 +255,10 @@
     "shareWhatsapp": "Kirim via WhatsApp",
     "exportImage": "Simpan sebagai Gambar",
     "rounding": {
-      "title": "Pembulatan",
       "100": "Per Rp 100",
       "500": "Per Rp 500",
-      "1000": "Per Rp 1.000"
+      "1000": "Per Rp 1.000",
+      "title": "Pembulatan"
     },
     "error": {
       "noPayers": "Pilih minimal 1 pemain untuk item ini"
@@ -397,7 +402,19 @@
       "body": "Selesaikan sesi pertandingan untuk mulai mencatat ranking dan performa pemain."
     },
     "rankLabel": "Peringkat {{rank}}",
-    "stats": "W-L-T: {{wins}}-{{losses}}-0 · WR: {{winRate}}% · {{matches}}M"
+    "stats": "{{wins}}M {{losses}}K · {{winRate}}% menang · {{matches}} main",
+    "public": {
+      "title": "Klasemen Sesi",
+      "subtitle": "Ringkasan hasil pertandingan",
+      "shareText": "Cek hasil klasemen sesi {{sport}} di FRDUP!",
+      "notFoundTitle": "Klasemen Tidak Ditemukan",
+      "notFoundBody": "Tautan ini mungkin sudah kadaluarsa (30 hari) atau ID tidak valid.",
+      "expiresNotice": "Tautan aktif selama 30 hari",
+      "createSession": "Main di FRDUP",
+      "tagline": "Aplikasi scoring & ranking santai untuk komunitas olahraga",
+      "shareAction": "Bagikan Link",
+      "copied": "Link disalin ke clipboard"
+    }
   },
   "sync": {
     "idle": "Tersinkron",

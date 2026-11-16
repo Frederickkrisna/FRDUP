@@ -86,6 +86,7 @@ describe('Firestore wire conversion', () => {
           winRate: 0.8,
           rpDelta: 25,
           tierAfter: 'gold',
+          divisionAfter: 1,
         },
       ],
       createdAt: 1_700_000_000_000,

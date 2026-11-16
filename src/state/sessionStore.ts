@@ -26,6 +26,7 @@ import {
   removeParticipant as removeParticipantPure,
   reopenMatch as reopenMatchPure,
   resetMatchScore,
+  canDeactivateCourt,
   setCourtActive as setCourtActivePure,
   setMatchScore,
   substituteInRound,
@@ -42,6 +43,10 @@ import { useBootStore } from './bootStore';
 import { jsonStorage } from './storage';
 
 export type StartResult = { ok: true; sessionId: Id } | { ok: false; error: 'insufficient_players' | 'limit' };
+export type CourtToggleResult =
+  | { ok: true; appliedNow: boolean }
+  | { ok: false; error: 'last_court' | 'readonly' | 'no_session' };
+
 export type NextRoundResult =
   | { ok: true; roundNumber: number }
   | { ok: false; error: 'unsettled' | 'insufficient_players' | 'limit' | 'no_session' | 'readonly' };
@@ -99,7 +104,8 @@ interface SessionState {
   substitute: (outId: Id, inId: Id) => void;
   addParticipant: (participant: SessionParticipant) => void;
   removeParticipant: (playerId: Id) => void;
-  setCourtActive: (courtId: Id, active: boolean) => void;
+  /** Takes effect immediately if the current round is untouched, otherwise from the next round. */
+  setCourtActive: (courtId: Id, active: boolean) => CourtToggleResult;
   claimCourts: (courtIds: Id[]) => void;
 
   /* bill */
@@ -402,9 +408,29 @@ export const useSessionStore = create<SessionState>()(
         },
 
         setCourtActive: (courtId, active) => {
-          const { session, role } = get();
-          if (!session || role === 'cohost') return;
-          set({ session: setCourtActivePure(session, courtId, active, Date.now()), sessionDirty: true });
+          const { session, rounds, role } = get();
+          if (!session) return { ok: false, error: 'no_session' };
+          if (role === 'cohost') return { ok: false, error: 'readonly' };
+          if (!active && !canDeactivateCourt(session, courtId)) return { ok: false, error: 'last_court' };
+          const now = Date.now();
+          const nextSession = setCourtActivePure(session, courtId, active, now);
+          set({ session: nextSession, sessionDirty: true });
+
+          // Nothing scored yet on the current round: rebuild it now so the change is visible at once
+          // (a court switched off disappears, a court switched on gets a match).
+          const current = sortRounds(rounds).at(-1);
+          if (!current || !current.matches.every((m) => m.status === 'scheduled')) return { ok: true, appliedNow: false };
+          try {
+            const others = rounds.filter((r) => r.id !== current.id);
+            const fresh = buildNextRound({ session: nextSession, rounds: others, plugin: pluginOf(nextSession), seed: randomSeed(), uid: uidNow(), now });
+            const replaced: RoundDoc = { ...fresh, id: current.id, createdAt: current.createdAt, revision: current.revision + 1 };
+            set((s) => ({ rounds: replaceRound(s.rounds, replaced) }));
+            markRoundDirty(replaced.id);
+            return { ok: true, appliedNow: true };
+          } catch (error) {
+            if (error instanceof InsufficientPlayersError) return { ok: true, appliedNow: false };
+            throw error;
+          }
         },
 
         claimCourts: (courtIds) => set({ claimedCourtIds: courtIds }),

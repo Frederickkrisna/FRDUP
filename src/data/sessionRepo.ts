@@ -71,6 +71,32 @@ export function newSessionDoc(input: NewSessionInput, now: Millis): SessionDoc {
   };
 }
 
+const JOIN_CODE_WRITE_TIMEOUT_MS = 10_000;
+
+export class WriteTimeoutError extends Error {
+  constructor() {
+    super('write timed out');
+    this.name = 'WriteTimeoutError';
+  }
+}
+
+/** Rejects if the server has not acknowledged in time (the write itself stays queued). */
+function withTimeout<T>(write: Promise<T>, ms: number): Promise<T> {
+  return new Promise<T>((resolve, reject) => {
+    const timer = setTimeout(() => reject(new WriteTimeoutError()), ms);
+    write.then(
+      (v) => {
+        clearTimeout(timer);
+        resolve(v);
+      },
+      (e: unknown) => {
+        clearTimeout(timer);
+        reject(e instanceof Error ? e : new Error(String(e)));
+      },
+    );
+  });
+}
+
 function randomUint32(): number {
   const buf = new Uint32Array(1);
   crypto.getRandomValues(buf);
@@ -155,15 +181,22 @@ export const sessionRepo = {
         const existing = await getDoc(paths.code(code));
         if (!existing.exists()) break;
         const data = decode<SessionCodeDoc>(existing.data());
-        if (data.sessionId === sessionId || data.expiresAt <= now) break; // ours, or dead
+        // Reusable only if it is ours: a dead code owned by another host cannot be overwritten (rules).
+        if (data.hostAnonUid === hostUid && (data.sessionId === sessionId || data.expiresAt <= now)) break;
         code = generateJoinCode(randomUint32);
       } catch {
         break; // offline / permission: accept the optimistic code
       }
     }
     const doc: SessionCodeDoc = { id: code, sessionId, hostAnonUid: hostUid, expiresAt, createdAt: now };
-    track('session.code', setDoc(paths.code(code), encode(doc)));
-    track('session.codeMirror', updateDoc(paths.session(sessionId), encode({ joinCode: code, joinCodeExpiresAt: expiresAt, updatedAt: now })));
+    // Awaited (bounded): a code the server never accepted would put a QR on screen that cannot work.
+    await withTimeout(
+      Promise.all([
+        setDoc(paths.code(code), encode(doc)),
+        updateDoc(paths.session(sessionId), encode({ joinCode: code, joinCodeExpiresAt: expiresAt, updatedAt: now })),
+      ]),
+      JOIN_CODE_WRITE_TIMEOUT_MS,
+    );
     return { code, expiresAt };
   },
 

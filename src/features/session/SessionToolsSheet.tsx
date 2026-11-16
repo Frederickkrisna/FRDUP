@@ -16,18 +16,21 @@ import { displayName, participantFromPlayer } from '@/features/shared/people';
 import { useRosterStore } from '@/state/rosterStore';
 import { useSessionStore } from '@/state/sessionStore';
 
-function Toggle({ on, label, onChange }: { on: boolean; label: string; onChange: (v: boolean) => void }) {
+function Toggle({ on, label, disabled, onChange }: { on: boolean; label: string; disabled?: boolean; onChange: (v: boolean) => void }) {
   return (
     <button
       type="button"
       role="switch"
       aria-checked={on}
       aria-label={label}
+      disabled={disabled}
       onClick={() => onChange(!on)}
-      className="pressable relative h-8 w-14 shrink-0 rounded-full border border-line transition-colors duration-200"
-      style={{ backgroundColor: on ? 'var(--c-primary)' : 'var(--c-surface-3)' }}
+      // 44px tap area around a 32px track; the knob is anchored left so it never drifts to the centre.
+      className="pressable relative -my-1.5 grid h-11 w-16 shrink-0 place-items-center disabled:opacity-40"
     >
-      <span aria-hidden="true" className={cn('absolute top-1 size-6 rounded-full transition-transform duration-200 ease-[var(--ease-out)]', on ? 'translate-x-7 bg-primary-on' : 'translate-x-1 bg-ink-muted')} />
+      <span aria-hidden="true" className="relative block h-8 w-14 rounded-full border border-line transition-colors duration-200" style={{ backgroundColor: on ? 'var(--c-primary)' : 'var(--c-surface-3)' }}>
+        <span className={cn('absolute left-0 top-[3px] size-6 rounded-full transition-transform duration-200 ease-[var(--ease-out)] motion-reduce:transition-none', on ? 'translate-x-[27px] bg-primary-on' : 'translate-x-[3px] bg-ink-muted')} />
+      </span>
     </button>
   );
 }
@@ -51,6 +54,17 @@ export function SessionToolsSheet({ open, onClose }: { open: boolean; onClose: (
   const left = session.participants.filter((p) => p.leftAtRound !== null);
   const known = new Set(present.map((p) => p.playerId));
   const candidates = roster.filter((p) => p.archivedAt === null && !known.has(p.id));
+  const activeCount = session.courts.filter((c) => c.isActive).length;
+
+  const toggleCourt = (courtId: string, label: string, active: boolean) => {
+    const res = setCourtActive(courtId, active);
+    if (!res.ok) {
+      if (res.error === 'last_court') toast.warning(t('session.tools.lastCourt'));
+      return;
+    }
+    const key = active ? (res.appliedNow ? 'courtOnNow' : 'courtOnNext') : res.appliedNow ? 'courtOffNow' : 'courtOffNext';
+    toast.info(t(`session.tools.${key}`, { court: label }));
+  };
 
   return (
     <Sheet open={open} onClose={onClose} title={t('session.tools.title')} closeLabel={t('common.close')}>
@@ -68,8 +82,11 @@ export function SessionToolsSheet({ open, onClose }: { open: boolean; onClose: (
             <ul className="flex flex-col gap-1.5">
               {session.courts.map((c) => (
                 <li key={c.id} className="flex min-h-12 items-center justify-between gap-3 rounded-md border border-line bg-surface-2 px-3">
-                  <span className="truncate text-[15px] font-semibold">{c.label}</span>
-                  <Toggle on={c.isActive} label={t('session.tools.courtActive', { court: c.label })} onChange={(v) => setCourtActive(c.id, v)} />
+                  <div className="min-w-0">
+                    <p className={cn('truncate text-[15px] font-semibold', !c.isActive && 'text-ink-muted')}>{c.label}</p>
+                    <p className="text-[12px] text-ink-faint">{c.isActive ? t('session.tools.courtOn') : t('session.tools.courtOff')}</p>
+                  </div>
+                  <Toggle on={c.isActive} disabled={c.isActive && activeCount <= 1} label={t('session.tools.courtActive', { court: c.label })} onChange={(v) => toggleCourt(c.id, c.label, v)} />
                 </li>
               ))}
             </ul>

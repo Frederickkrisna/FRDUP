@@ -14,11 +14,15 @@ import type { StandingRow } from '@/core/matchmaking/types';
 
 type SortKey = 'rank' | 'matchesPlayed' | 'wins' | 'pointsFor' | 'pointDiff' | 'winRate';
 
-const COLS: Array<{ key: SortKey; label: string; text?: string; aria: string }> = [
-  { key: 'matchesPlayed', label: 'session.standings.played', text: 'M', aria: 'session.standings.playedFull' },
-  { key: 'wins', label: 'session.standings.wins', text: 'W-L-T', aria: 'session.standings.winsFull' },
-  { key: 'pointsFor', label: 'session.standings.points', text: 'P', aria: 'session.standings.pointsFull' },
-  { key: 'pointDiff', label: 'session.standings.diff', text: 'Diff', aria: 'session.standings.diffFull' },
+/**
+ * Fixed widths sized for a 360px phone: the player column keeps >= 120px for the name, numbers
+ * never wrap or spill into the next column. The draws column only exists when a sport produced one.
+ */
+const COLS: Array<{ key: SortKey; label: string; aria: string; width: string }> = [
+  { key: 'matchesPlayed', label: 'session.standings.playedShort', aria: 'session.standings.playedFull', width: 'w-10' },
+  { key: 'wins', label: 'session.standings.record', aria: 'session.standings.winsFull', width: 'w-[52px]' },
+  { key: 'pointsFor', label: 'session.standings.points', aria: 'session.standings.pointsFull', width: 'w-11' },
+  { key: 'pointDiff', label: 'session.standings.diff', aria: 'session.standings.diffFull', width: 'w-11' },
 ];
 
 export function StandingsScreen() {
@@ -44,6 +48,8 @@ export function StandingsScreen() {
     return computeSessionRp({ standing: row, participantCount: Math.max(1, rankedCount), streakSessions: 0 }).delta;
   };
 
+  const hasDraws = standings.some((s) => s.draws > 0);
+
   if (!session) return null;
   if (standings.every((s) => s.matchesPlayed === 0)) return <EmptyState art="chart" title={t('session.standings.noData')} body={t('session.standings.noDataBody')} />;
 
@@ -51,23 +57,23 @@ export function StandingsScreen() {
   const ariaSort = (key: SortKey): 'ascending' | 'descending' | 'none' => (sort.key === key ? (sort.dir === 'asc' ? 'ascending' : 'descending') : 'none');
 
   return (
-    <div className="px-2 pt-3">
+    <div className="px-3 pt-3">
       <table className="w-full table-fixed border-separate border-spacing-0">
         <caption className="sr-only">{t('session.standings.title')}</caption>
         <thead className="sticky top-14 z-10 bg-bg">
           <tr className="text-[12px] font-bold uppercase tracking-[0.06em] text-ink-muted">
-            <th scope="col" aria-sort={ariaSort('rank')} className="w-9 py-2 text-center">
+            <th scope="col" aria-sort={ariaSort('rank')} className="w-8 py-2 text-center">
               <button type="button" onClick={() => toggle('rank')} className="pressable min-h-11 w-full" aria-label={t('session.standings.rankFull')}>
                 {t('session.standings.rank')}
               </button>
             </th>
-            <th scope="col" className="py-2 text-left">
+            <th scope="col" className="py-2 pl-1 text-left">
               {t('session.standings.player')}
             </th>
             {COLS.map((c) => (
-              <th key={c.key} scope="col" aria-sort={ariaSort(c.key)} className="w-12 py-2 text-center">
-                <button type="button" onClick={() => toggle(c.key)} className="pressable inline-flex min-h-11 w-full items-center justify-center gap-0.5 text-[11px] font-bold" aria-label={t(c.aria)}>
-                  {c.text ?? t(c.label)}
+              <th key={c.key} scope="col" aria-sort={ariaSort(c.key)} className={cn('py-2 text-center', c.key === 'wins' && hasDraws ? 'w-16' : c.width)}>
+                <button type="button" onClick={() => toggle(c.key)} className="pressable inline-flex min-h-11 w-full items-center justify-center gap-0.5 whitespace-nowrap text-[11px] font-bold" aria-label={t(c.aria)}>
+                  {c.key === 'wins' && hasDraws ? t('session.standings.recordDraws') : t(c.label)}
                   {sort.key === c.key ? sort.dir === 'desc' ? <ArrowDown size={11} aria-hidden="true" /> : <ArrowUp size={11} aria-hidden="true" /> : null}
                 </button>
               </th>
@@ -85,13 +91,13 @@ export function StandingsScreen() {
                 <th scope="row" className="num rounded-l-md text-center text-[16px] font-bold" style={top ? { color: `var(--tier-${r.rank === 1 ? 'legend' : r.rank === 2 ? 'elite' : 'warrior'})` } : undefined}>
                   {r.rank}
                 </th>
-                <td className="min-w-0 py-1 pl-1 pr-1">
+                <td className="py-1 pl-1 pr-1">
                   <div className="flex min-w-0 items-center gap-2">
                     <Avatar name={p.name} initials={initialsOf(p.name)} color={p.avatarColor} src={p.avatarUrl} size="xs" />
-                    <div className="min-w-0">
+                    <div className="min-w-0 flex-1">
                       <p className="truncate font-semibold leading-tight">{displayName(p)}</p>
                       {delta !== null ? (
-                        <p className="num text-[11px] leading-tight text-ink-muted" title={t('session.standings.projectedHint')}>
+                        <p className="num truncate text-[11px] leading-tight text-ink-muted" title={t('session.standings.projectedHint')}>
                           {t('session.standings.projected', { delta: delta > 0 ? `+${delta}` : String(delta) })}
                         </p>
                       ) : null}
@@ -99,8 +105,8 @@ export function StandingsScreen() {
                   </div>
                 </td>
                 <td className="num text-center text-[14px]">{r.matchesPlayed}</td>
-                <td className="num text-center text-[13px] font-medium whitespace-nowrap">
-                  {r.wins}-{r.losses}-{r.draws}
+                <td className="num whitespace-nowrap text-center text-[13px] font-medium tracking-tight">
+                  {hasDraws ? `${r.wins}-${r.losses}-${r.draws}` : `${r.wins}-${r.losses}`}
                 </td>
                 <td className="num text-center font-bold text-[14px]">{r.pointsFor}</td>
                 <td className={cn('num rounded-r-md text-center text-[13px]', r.pointDiff > 0 ? 'text-success font-semibold' : r.pointDiff < 0 ? 'text-danger font-semibold' : 'text-ink-muted')}>{r.pointDiff > 0 ? `+${r.pointDiff}` : r.pointDiff}</td>

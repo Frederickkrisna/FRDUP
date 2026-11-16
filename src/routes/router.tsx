@@ -52,6 +52,7 @@ export const routes: RouteObject[] = [
   },
   { path: '/session/:sessionId/join-code', lazy: screen(() => import('./session/JoinCodeScreen'), 'JoinCodeScreen'), ErrorBoundary: RouteError },
   { path: '/session/:sessionId/finish', lazy: screen(() => import('./session/FinishScreen'), 'FinishScreen'), ErrorBoundary: RouteError },
+  { path: '/board/:boardId', lazy: screen(() => import('./screens/PublicBoardScreen'), 'PublicBoardScreen'), ErrorBoundary: RouteError },
   { path: '/join/:code?', lazy: screen(() => import('./screens/JoinScreen'), 'JoinScreen'), ErrorBoundary: RouteError },
   ...(import.meta.env.DEV
     ? [{ path: '/__dev/export', lazy: screen(() => import('./dev/ExportDemo'), 'ExportDemo') } satisfies RouteObject, { path: '/__dev/analytics', lazy: screen(() => import('./dev/AnalyticsDemo'), 'AnalyticsDemo') } satisfies RouteObject]

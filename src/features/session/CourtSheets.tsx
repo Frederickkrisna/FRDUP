@@ -23,6 +23,8 @@ export type CourtSheetState =
   | { kind: 'menu'; roundId: Id; matchId: Id }
   | { kind: 'swap'; roundId: Id; playerId: Id }
   | { kind: 'substitute'; roundId: Id; playerId: Id }
+  /** Step 1 of swap/substitute from the match menu: WHICH player on this court? */
+  | { kind: 'pick'; roundId: Id; matchId: Id; then: 'swap' | 'substitute' }
   | null;
 
 type SheetProps = { onClose: () => void; onSwitch: (next: CourtSheetState) => void };
@@ -134,7 +136,7 @@ export function MenuSheet({ roundId, matchId, onClose, onSwitch }: SheetProps & 
   const byId = useParticipantMap();
   if (!match) return null;
   const settled = match.status === 'completed' || match.status === 'voided';
-  const firstPlayer = match.teams[0]?.[0];
+  const hasPlayers = match.teams.some((team) => team.length > 0);
 
   const row = 'pressable flex min-h-14 w-full items-center gap-3 rounded-md border border-line bg-surface-2 px-4 text-left text-[16px] font-semibold disabled:opacity-40';
 
@@ -145,11 +147,11 @@ export function MenuSheet({ roundId, matchId, onClose, onSwitch }: SheetProps & 
           <Check size={20} aria-hidden="true" />
           {t('session.court.editScore')}
         </button>
-        <button type="button" className={row} disabled={!firstPlayer || settled} onClick={() => firstPlayer && onSwitch({ kind: 'swap', roundId, playerId: firstPlayer })}>
+        <button type="button" className={row} disabled={!hasPlayers || settled} onClick={() => onSwitch({ kind: 'pick', roundId, matchId, then: 'swap' })}>
           <Shuffle size={20} aria-hidden="true" />
           {t('session.court.swapPlayers')}
         </button>
-        <button type="button" className={row} disabled={!firstPlayer || settled} onClick={() => firstPlayer && onSwitch({ kind: 'substitute', roundId, playerId: firstPlayer })}>
+        <button type="button" className={row} disabled={!hasPlayers || settled} onClick={() => onSwitch({ kind: 'pick', roundId, matchId, then: 'substitute' })}>
           <UserRoundPen size={20} aria-hidden="true" />
           {t('session.court.substitute')}
         </button>
@@ -186,8 +188,52 @@ export function MenuSheet({ roundId, matchId, onClose, onSwitch }: SheetProps & 
   );
 }
 
+/* --------------------------------------------------------------------------- pick sheet */
+
+function PlayerButton({ id, onClick, disabled }: { id: Id; onClick: () => void; disabled?: boolean }) {
+  const byId = useParticipantMap();
+  const p = byId.get(id);
+  if (!p) return null;
+  return (
+    <button type="button" disabled={disabled} onClick={onClick} className="pressable flex min-h-14 w-full items-center gap-3 rounded-md border border-line bg-surface-2 px-3 text-left disabled:opacity-40">
+      <Avatar name={p.name} initials={initialsOf(p.name)} color={p.avatarColor} src={p.avatarUrl} size="sm" />
+      <span className="truncate text-[16px] font-semibold">{displayName(p)}</span>
+    </button>
+  );
+}
+
+/** "Who is stepping out?": one tap per player on this court, then the swap/substitute sheet. */
+export function PickPlayerSheet({ roundId, matchId, then, onClose, onSwitch }: SheetProps & { roundId: Id; matchId: Id; then: 'swap' | 'substitute' }) {
+  const { t } = useTranslation();
+  const match = useMatch(roundId, matchId);
+  if (!match) return null;
+  return (
+    <Sheet open onClose={onClose} title={t(then === 'swap' ? 'session.court.pickSwapTitle' : 'session.court.pickSubTitle')} closeLabel={t('common.close')}>
+      <div className="flex flex-col gap-4 pb-4">
+        {match.teams.map((ids, i) => (
+          <section key={i} aria-label={t('session.court.teamN', { n: i + 1 })}>
+            <h3 className="mb-1.5 text-[12px] font-extrabold uppercase tracking-[0.08em] text-ink-muted">{t('session.court.teamN', { n: i + 1 })}</h3>
+            <ul className="flex flex-col gap-1.5">
+              {ids.map((id) => (
+                <li key={id}>
+                  <PlayerButton id={id} onClick={() => onSwitch({ kind: then, roundId, playerId: id })} />
+                </li>
+              ))}
+            </ul>
+          </section>
+        ))}
+      </div>
+    </Sheet>
+  );
+}
+
 /* --------------------------------------------------------------------------- swap sheet */
 
+/**
+ * Swap two players in the current round. Resting players come first: "X has to step away, Y plays
+ * now". The one who went to the bench rested this round, so the next round plays them first
+ * (rest queue: never benched twice in a row).
+ */
 export function SwapSheet({ roundId, playerId, onClose }: { roundId: Id; playerId: Id; onClose: () => void }) {
   const { t } = useTranslation();
   const round = useSessionStore((s) => s.rounds.find((r) => r.id === roundId));
@@ -196,46 +242,45 @@ export function SwapSheet({ roundId, playerId, onClose }: { roundId: Id; playerI
   const byId = useParticipantMap();
   if (!round) return null;
   const self = byId.get(playerId);
+  const selfName = self ? displayName(self) : '';
+  const selfResting = round.restingPlayerIds.includes(playerId);
+  const ownMatch = round.matches.find((m) => m.teams.some((team) => team.includes(playerId)));
+  const ownSettled = ownMatch ? ownMatch.status === 'completed' || ownMatch.status === 'voided' : false;
 
-  const groups = [
-    ...round.matches.map((m) => ({
-      key: m.id,
-      title: courts?.find((c) => c.id === m.courtId)?.label ?? '',
-      ids: m.teams.flat().filter((id) => id !== playerId),
-      locked: m.status === 'completed' || m.status === 'voided',
-    })),
-    { key: 'bench', title: t('session.court.resting'), ids: round.restingPlayerIds.filter((id) => id !== playerId), locked: false },
-  ].filter((g) => g.ids.length > 0);
+  const bench = { key: 'bench', title: t('session.court.benchPlaysNow'), ids: round.restingPlayerIds.filter((id) => id !== playerId), locked: false };
+  const courtGroups = round.matches.map((m) => ({
+    key: m.id,
+    title: courts?.find((c) => c.id === m.courtId)?.label ?? '',
+    // Same match: only the other team (swapping teammates changes nothing).
+    ids: m.teams.filter((team) => !team.includes(playerId)).flat(),
+    locked: m.status === 'completed' || m.status === 'voided',
+  }));
+  const groups = (selfResting ? courtGroups : [bench, ...courtGroups]).filter((g) => g.ids.length > 0);
+
+  const pick = (otherId: Id, fromBench: boolean) => {
+    const other = byId.get(otherId);
+    const otherName = other ? displayName(other) : '';
+    swap(roundId, playerId, otherId);
+    haptic('medium');
+    if (selfResting) toast.success(t('session.court.benchSwapDone', { inn: selfName, out: otherName }));
+    else if (fromBench) toast.success(t('session.court.benchSwapDone', { inn: otherName, out: selfName }));
+    else toast.success(t('session.court.swapDone', { a: selfName, b: otherName }));
+    onClose();
+  };
 
   return (
-    <Sheet open onClose={onClose} title={t('session.court.swapWith', { name: self ? displayName(self) : '' })} closeLabel={t('common.close')}>
+    <Sheet open onClose={onClose} title={selfResting ? t('session.court.playInsteadOf', { name: selfName }) : t('session.court.swapWith', { name: selfName })} closeLabel={t('common.close')}>
       <div className="flex flex-col gap-4 pb-4">
+        {!selfResting && bench.ids.length === 0 ? <p className="rounded-md border border-line bg-surface px-3 py-2 text-[13px] text-ink-muted">{t('session.court.noBenchHint')}</p> : null}
         {groups.map((g) => (
           <section key={g.key} aria-label={g.title}>
             <h3 className="mb-1.5 text-[12px] font-extrabold uppercase tracking-[0.08em] text-ink-muted">{g.title}</h3>
             <ul className="flex flex-col gap-1.5">
-              {g.ids.map((id) => {
-                const p = byId.get(id);
-                if (!p) return null;
-                return (
-                  <li key={id}>
-                    <button
-                      type="button"
-                      disabled={g.locked}
-                      className="pressable flex min-h-14 w-full items-center gap-3 rounded-md border border-line bg-surface-2 px-3 text-left disabled:opacity-40"
-                      onClick={() => {
-                        swap(roundId, playerId, id);
-                        haptic('medium');
-                        toast.success(t('session.court.swapDone', { a: self ? displayName(self) : '', b: displayName(p) }));
-                        onClose();
-                      }}
-                    >
-                      <Avatar name={p.name} initials={initialsOf(p.name)} color={p.avatarColor} size="sm" />
-                      <span className="truncate text-[16px] font-semibold">{displayName(p)}</span>
-                    </button>
-                  </li>
-                );
-              })}
+              {g.ids.map((id) => (
+                <li key={id}>
+                  <PlayerButton id={id} disabled={g.locked || ownSettled} onClick={() => pick(id, g.key === 'bench')} />
+                </li>
+              ))}
             </ul>
           </section>
         ))}
@@ -324,5 +369,7 @@ export function CourtSheets({ state, onClose, onSwitch }: { state: CourtSheetSta
       return <SwapSheet roundId={state.roundId} playerId={state.playerId} onClose={onClose} />;
     case 'substitute':
       return <SubstituteSheet roundId={state.roundId} playerId={state.playerId} onClose={onClose} />;
+    case 'pick':
+      return <PickPlayerSheet roundId={state.roundId} matchId={state.matchId} then={state.then} onClose={onClose} onSwitch={onSwitch} />;
   }
 }
