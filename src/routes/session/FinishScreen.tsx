@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react';
-import { ArrowRight, ChevronDown, Flag, Link2, Pencil, Share2 } from 'lucide-react';
+import { ArrowRight, ChevronDown, FileText, Flag, Link2, Pencil, Share2 } from 'lucide-react';
 import { useNavigate, useParams } from 'react-router';
 import { useTranslation } from 'react-i18next';
 
@@ -13,6 +13,7 @@ import { TierBadge } from '@/components/TierBadge';
 import { cn } from '@/components/cn';
 import { toast } from '@/components/toast/toastStore';
 import { playedRounds, unsettledMatchCount } from '@/core/session/finish';
+import { standingPoints } from '@/core/standings/computeStandings';
 import { initialsOf } from '@/core/utils/avatar';
 import { sessionCardData, tierUpCardData } from '@/features/export/cardData';
 import { ExportSheet, TierUpExport } from '@/features/export/ExportSheet';
@@ -52,6 +53,7 @@ export function FinishScreen() {
   const [shareTier, setShareTier] = useState<RankChange | null>(null);
   const [sharingPublic, setSharingPublic] = useState(false);
   const [publicBoardId, setPublicBoardId] = useState<string | null>(null);
+  const [pdfBusy, setPdfBusy] = useState(false);
 
   const unsettled = unsettledMatchCount(rounds);
   const done = session?.rankingApplied === true;
@@ -119,7 +121,7 @@ export function FinishScreen() {
             rank: s.rank,
             matchesPlayed: s.matchesPlayed,
             wins: s.wins,
-            pointsFor: s.pointsFor,
+            pointsFor: standingPoints(s),
             pointsAgainst: s.pointsAgainst,
             pointDiff: s.pointDiff,
             winRate: s.winRate,
@@ -148,18 +150,31 @@ export function FinishScreen() {
             title: session.title || t('session.finish.shareLinkTitle'),
             url: shareUrl,
           });
-          toast.success(t('session.finish.linkShared'));
           return;
         } catch (e) {
           if ((e as Error).name === 'AbortError') return;
         }
       }
       await navigator.clipboard.writeText(shareUrl);
-      toast.success(t('session.finish.linkCopied'));
+      toast.info(t('session.finish.linkCopied')); // no share sheet: tell them it went to the clipboard
     } catch {
       toast.danger(t('session.finish.shareFailed'));
     } finally {
       setSharingPublic(false);
+    }
+  };
+
+  const handlePdf = async () => {
+    if (!finish) return;
+    setPdfBusy(true);
+    try {
+      const { renderSessionPdf, sessionReport, sharePdf } = await import('@/features/export/sessionPdf');
+      const report = sessionReport({ session, rounds: useSessionStore.getState().rounds, standings: finish.standings, t });
+      await sharePdf(await renderSessionPdf(report), report.filename);
+    } catch {
+      toast.danger(t('session.finish.pdf.failed'));
+    } finally {
+      setPdfBusy(false);
     }
   };
 
@@ -190,7 +205,7 @@ export function FinishScreen() {
           initials: initialsOf(p?.name ?? '?'),
           color: p?.avatarColor ?? 'transparent',
           src: p?.avatarUrl,
-          value: `${row?.pointsFor ?? 0} ${t('session.finish.pointsShort')}`,
+          value: `${row ? standingPoints(row) : 0} ${t('session.finish.pointsShort')}`,
           badge: change ? <TierBadge tier={change.to.tier} division={change.to.division} stars={change.to.stars} size="sm" /> : undefined,
         };
       })
@@ -258,12 +273,13 @@ export function FinishScreen() {
                           <p className="truncate text-[16px] font-semibold leading-tight">{p ? displayName(p) : '?'}</p>
                           {sRow ? (
                             <p className="num text-[12px] text-ink-muted">
-                              {t('session.finish.playerStats', { points: sRow.pointsFor, wins: sRow.wins, losses: sRow.losses })}
+                              {t('session.finish.playerStats', { points: standingPoints(sRow), wins: sRow.wins, losses: sRow.losses })}
                             </p>
                           ) : null}
                         </div>
-                        <span className={cn('num shrink-0 text-[16px] font-bold', c.delta > 0 ? 'text-success' : c.delta < 0 ? 'text-danger' : 'text-ink-muted')}>
-                          {c.delta > 0 ? `+${c.delta}` : c.delta === 0 ? t('session.finish.noChange') : c.delta}
+                        {/* A short value, so the name keeps its room at 360px; the hint above says why it is 0. */}
+                        <span className={cn('num shrink-0 text-[16px] font-bold', c.delta > 0 ? 'text-success' : c.delta < 0 ? 'text-danger' : 'text-ink-muted')} aria-label={c.delta === 0 ? t('session.finish.noChange') : undefined}>
+                          {c.delta > 0 ? `+${c.delta}` : c.delta === 0 ? '±0' : c.delta}
                         </span>
                         <TierBadge tier={c.to.tier} division={c.to.division} size="sm" />
                         <ChevronDown size={16} className={cn('shrink-0 text-ink-faint transition-transform duration-200 motion-reduce:transition-none', open && 'rotate-180')} aria-hidden="true" />
@@ -304,6 +320,9 @@ export function FinishScreen() {
               onClick={() => void handleSharePublicLink()}
             >
               {t('session.finish.shareLink')}
+            </Button>
+            <Button size="lg" fullWidth variant="secondary" leftIcon={<FileText size={18} aria-hidden="true" />} loading={pdfBusy} disabled={!finish || finish.standings.length === 0} onClick={() => void handlePdf()}>
+              {t('session.finish.pdf.button')}
             </Button>
             <Button size="lg" fullWidth variant="secondary" leftIcon={<ArrowRight size={18} aria-hidden="true" />} onClick={() => void navigate(`/session/${session.id}/bill`)}>
               {t('session.finish.continueToBill')}

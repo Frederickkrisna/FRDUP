@@ -12,13 +12,18 @@ import type { StandingRow } from '@/core/matchmaking/types';
 
 type SortField = SportPlugin['standingsSort'][number]['field'];
 
-/** points means points scored (pointsFor); the other fields map 1:1 onto StandingRow. */
+/** Points a row ranks on: points scored plus the +M compensation for missed matches. */
+export function standingPoints(row: Pick<StandingRow, 'pointsFor' | 'compensation'>): number {
+  return row.pointsFor + row.compensation;
+}
+
+/** points means standingPoints; the other fields map 1:1 onto StandingRow. */
 function sortValue(row: StandingRow, field: SortField): number {
-  return field === 'points' ? row.pointsFor : row[field];
+  return field === 'points' ? standingPoints(row) : row[field];
 }
 
 /** Build initial per-player accumulators. */
-function emptyRow(playerId: Id): Omit<StandingRow, 'rank' | 'winRate'> {
+function emptyRow(playerId: Id): Omit<StandingRow, 'rank' | 'winRate' | 'compensation'> {
   return {
     playerId,
     matchesPlayed: 0,
@@ -80,10 +85,17 @@ export function computeStandings(
     }
   }
 
+  // +M: when the rotation leaves someone with fewer matches, credit each missed match at that
+  // player's own average, so a points ranking compares like with like. Wins-first sports skip it.
+  const compensate = plugin.standingsSort[0]?.field === 'points';
+  let maxPlayed = 0;
+  for (const r of acc.values()) maxPlayed = Math.max(maxPlayed, r.matchesPlayed);
+
   // Build rows array with winRate
   const rows: StandingRow[] = Array.from(acc.values()).map((r) => ({
     ...r,
     winRate: r.matchesPlayed > 0 ? r.wins / r.matchesPlayed : 0,
+    compensation: compensate && r.matchesPlayed > 0 ? Math.round((r.pointsFor / r.matchesPlayed) * (maxPlayed - r.matchesPlayed)) : 0,
     rank: 0, // set below
   }));
 

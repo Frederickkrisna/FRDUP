@@ -42,6 +42,8 @@ export interface SessionDoc {
   courts: CourtDef[];
   targetRounds: number | null;
   plannedEndAt: Millis | null;
+  /** Private leaderboard: standings stay covered on every device until the host reveals them. Absent = shown. */
+  standingsHidden?: boolean;
   participants: SessionParticipant[];
   currentRoundNumber: number;
   completedRoundCount: number;

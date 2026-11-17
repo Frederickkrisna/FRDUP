@@ -120,15 +120,12 @@
         "title": "Court Settings",
         "count": "Number of Courts",
         "label": "Label",
-        "targetRounds": "Target Rounds",
-        "targetRoundsHint": "Choose court rental duration or specify number of rounds",
+        "targetRounds": "Rounds",
         "duration": "Duration",
         "openEnded": "Open-Ended",
         "fairnessPreview": "{{players}} players, {{courts}} courts → {{playing}} playing, {{resting}} resting each round",
-        "countHint": "Max {{max}} courts",
         "labelN": "Label {{n}}",
         "underfilled": "Need min {{needed}} players per court — only {{active}} active courts",
-        "restNote": "Resting players rotate each round",
         "preset1h": "1 Hour",
         "preset1h5": "1.5 Hours",
         "preset2h": "2 Hours",
@@ -136,8 +133,8 @@
         "preset3h": "3 Hours",
         "presetRounds": "~{{n}} rounds",
         "customRounds": "{{n}} Rounds",
-        "customEstimate": "Estimated ~{{min}} mins (can end anytime)",
-        "openEndedNote": "Open-ended mode: Play as many rounds as desired, then finish the session anytime."
+        "auto": "Auto ({{n}} rounds)",
+        "autoHint": "Until everyone has met everyone"
       },
       "format": {
         "title": "Game Format",

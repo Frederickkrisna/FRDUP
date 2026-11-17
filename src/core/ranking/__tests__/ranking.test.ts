@@ -117,6 +117,7 @@ describe('computeSessionRp', () => {
     pointDiff: 40,
     winRate: 0.8,
     restCount: 0,
+    compensation: 0,
   };
 
   it('winner of 9 players earns positive RP', () => {

@@ -54,7 +54,8 @@ interface SetupDraft {
   guests: RosterPlayerDoc[];
   courtCount: number | null;
   courtLabels: string[];
-  targetRounds: number | null;
+  /** 'auto' = a full Americano for the roster and courts (estimateRounds), resolved at start. */
+  targetRounds: number | 'auto' | null;
   format: string;
   config: Record<string, number | boolean | string>;
   title: string;
@@ -69,7 +70,7 @@ const emptyDraft = {
   guests: [] as RosterPlayerDoc[],
   courtCount: null,
   courtLabels: [] as string[],
-  targetRounds: null,
+  targetRounds: 'auto' as number | 'auto' | null,
   format: 'americano',
   config: {} as Record<string, number | boolean | string>,
   title: '',

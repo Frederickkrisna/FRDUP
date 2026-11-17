@@ -33,10 +33,7 @@ export function DataSection({ hostId }: { hostId: string }) {
     setBusy('export');
     try {
       const outcome = await saveBackup(await createBackup(hostId));
-      if (outcome !== 'cancelled') {
-        noteBackup();
-        toast.success(outcome === 'shared' ? t('settings.data.exportShared') : t('settings.data.exportDone'));
-      }
+      if (outcome !== 'cancelled') noteBackup();
     } catch {
       toast.danger(t('settings.data.exportFailed'));
     } finally {

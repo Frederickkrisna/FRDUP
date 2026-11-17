@@ -82,8 +82,6 @@ interface SessionState {
   billDirty: boolean;
 
   undo: UndoEntry[];
-  /** Unsent toast-worthy merge notices ("Skor lapangan 2 diperbarui oleh HP Rizky"). */
-  notices: Array<{ id: string; courtLabel: string; by: string }>;
 
   /* lifecycle */
   startSession: (input: NewSessionInput) => StartResult;
@@ -115,6 +113,7 @@ interface SessionState {
   /** Takes effect immediately if the current round is untouched, otherwise from the next round. */
   setCourtActive: (courtId: Id, active: boolean) => CourtToggleResult;
   claimCourts: (courtIds: Id[]) => void;
+  setStandingsHidden: (hidden: boolean) => void;
 
   /* bill */
   ensureBill: (args: { hostId: Id; roundingTo: number; hostPlayerId: Id | null }) => void;
@@ -137,7 +136,6 @@ interface SessionState {
   applyRemoteSession: (remote: SessionDoc) => void;
   markFlushed: (flushed: { roundIds: Id[]; session: boolean; bill: boolean }) => void;
   markRoundBase: (roundId: Id, revision: number) => void;
-  dismissNotice: (id: string) => void;
 }
 
 const UNDO_CAP = 50;
@@ -226,7 +224,6 @@ export const useSessionStore = create<SessionState>()(
         sessionDirty: false,
         billDirty: false,
         undo: [],
-        notices: [],
 
         /* ---------------------------------------------------------------- lifecycle */
 
@@ -259,7 +256,6 @@ export const useSessionStore = create<SessionState>()(
             sessionDirty: true,
             billDirty: false,
             undo: [],
-            notices: [],
           });
           return { ok: true, sessionId: session.id };
         },
@@ -278,11 +274,10 @@ export const useSessionStore = create<SessionState>()(
             sessionDirty: false,
             billDirty: false,
             undo: [],
-            notices: [],
           }),
 
         leave: () =>
-          set({ session: null, rounds: [], bill: null, billIssues: [], finish: null, role: 'host', claimedCourtIds: [], baseRevision: {}, dirtyRounds: [], sessionDirty: false, billDirty: false, undo: [], notices: [] }),
+          set({ session: null, rounds: [], bill: null, billIssues: [], finish: null, role: 'host', claimedCourtIds: [], baseRevision: {}, dirtyRounds: [], sessionDirty: false, billDirty: false, undo: [] }),
 
         discard: () => get().leave(),
 
@@ -302,6 +297,8 @@ export const useSessionStore = create<SessionState>()(
               rounds: [...s.rounds, round],
               session: s.session && {
                 ...s.session,
+                // Playing past the target ("Tambah ronde") moves the target along.
+                targetRounds: s.session.targetRounds !== null && round.roundNumber > s.session.targetRounds ? round.roundNumber : s.session.targetRounds,
                 currentRoundNumber: round.roundNumber,
                 completedRoundCount: s.rounds.filter((r) => r.status === 'completed').length,
                 updatedAt: now,
@@ -459,6 +456,11 @@ export const useSessionStore = create<SessionState>()(
 
         claimCourts: (courtIds) => set({ claimedCourtIds: courtIds }),
 
+        setStandingsHidden: (hidden) => {
+          if (get().role !== 'host') return;
+          set((s) => ({ session: s.session && { ...s.session, standingsHidden: hidden, updatedAt: Date.now() }, sessionDirty: true }));
+        },
+
         /* ---------------------------------------------------------------------- bill */
 
         ensureBill: ({ hostId, roundingTo, hostPlayerId }) => {
@@ -576,7 +578,6 @@ export const useSessionStore = create<SessionState>()(
           if (!session) return;
           let next = rounds;
           const dirty: Id[] = [];
-          const notices: SessionState['notices'] = [];
           const bases = { ...baseRevision };
           for (const r of remote) {
             bases[r.id] = Math.max(bases[r.id] ?? 0, r.revision);
@@ -589,19 +590,11 @@ export const useSessionStore = create<SessionState>()(
             const merged = mergeRounds(local, r, role, uidNow(), Date.now());
             next = replaceRound(next, merged);
             dirty.push(merged.id);
-            for (const m of merged.matches) {
-              const before = local.matches.find((x) => x.id === m.id);
-              if (before && before.score.points.join() !== m.score.points.join()) {
-                const court = session.courts.find((c) => c.id === m.courtId);
-                notices.push({ id: `${merged.id}:${m.id}:${merged.revision}`, courtLabel: court?.label ?? '', by: r.lastWriterUid });
-              }
-            }
           }
           set((s) => ({
             rounds: next,
             baseRevision: bases,
             dirtyRounds: [...new Set([...s.dirtyRounds, ...dirty])],
-            notices: [...s.notices, ...notices].slice(-5),
           }));
         },
 
@@ -620,7 +613,6 @@ export const useSessionStore = create<SessionState>()(
 
         markRoundBase: (roundId, revision) => set((s) => ({ baseRevision: { ...s.baseRevision, [roundId]: revision } })),
 
-        dismissNotice: (id) => set((s) => ({ notices: s.notices.filter((n) => n.id !== id) })),
       };
     },
     {

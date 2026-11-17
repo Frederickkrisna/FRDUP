@@ -28,6 +28,7 @@ test.describe('offline-first', () => {
     await expect(court(page, 0).getByRole('button', { name: /Buka papan skor.*sekarang 5/ })).toBeVisible();
 
     await context.setOffline(false);
-    await expect(page.getByRole('status').filter({ hasText: 'Tersinkron' })).toBeVisible({ timeout: 30_000 });
+    // Back online the row goes away once the queued writes are acknowledged (no success toast).
+    await expect(page.getByRole('status').filter({ hasText: 'Offline' })).toHaveCount(0, { timeout: 30_000 });
   });
 });

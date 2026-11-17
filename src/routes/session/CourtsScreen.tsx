@@ -1,5 +1,5 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
-import { ArrowRight, CornerUpLeft, Flag, History, Shuffle } from 'lucide-react';
+import { useCallback, useMemo, useState } from 'react';
+import { ArrowRight, CornerUpLeft, Flag, Plus, Shuffle } from 'lucide-react';
 import { useNavigate } from 'react-router';
 import { useTranslation } from 'react-i18next';
 
@@ -59,8 +59,6 @@ export function CourtsScreen() {
   const rounds = useSessionStore((s) => s.rounds);
   const generateNextRound = useSessionStore((s) => s.generateNextRound);
   const reshuffle = useSessionStore((s) => s.reshuffleRound);
-  const notices = useSessionStore((s) => s.notices);
-  const dismissNotice = useSessionStore((s) => s.dismissNotice);
   const [sheet, setSheet] = useState<CourtSheetState>(null);
   /**
    * The round on screen. Pinned at mount to the live round, so finishing its last match does not
@@ -71,14 +69,6 @@ export function CourtsScreen() {
   const openScore = useCallback((roundId: string, matchId: string) => setSheet({ kind: 'score', roundId, matchId }), []);
   const openMenu = useCallback((roundId: string, matchId: string) => setSheet({ kind: 'menu', roundId, matchId }), []);
   const longPress = useCallback((roundId: string, playerId: string) => setSheet({ kind: 'swap', roundId, playerId }), []);
-
-  // Surface co-host merge notices as quiet toasts, once each.
-  useEffect(() => {
-    for (const n of notices) {
-      toast.info(t('session.court.scoreUpdatedByCohost', { court: n.courtLabel, device: t('cohost.otherDevice') }));
-      dismissNotice(n.id);
-    }
-  }, [notices, dismissNotice, t]);
 
   const sorted = useMemo(() => [...rounds].sort((a, b) => a.roundNumber - b.roundNumber), [rounds]);
   const live = liveRound(sorted);
@@ -130,13 +120,6 @@ export function CourtsScreen() {
         )}
       </div>
 
-      {round.roundNumber < live.roundNumber ? (
-        <p role="status" className="flex items-start gap-2 rounded-md border border-line bg-surface px-3 py-2.5 text-[13px] text-ink-muted">
-          <History size={16} className="mt-0.5 shrink-0 text-info" aria-hidden="true" />
-          {t('session.court.pastRoundNote')}
-        </p>
-      ) : null}
-
       <div key={round.id} className="flex flex-col gap-3">
         {roundCourts.map((court, i) => (
           <CourtCard
@@ -165,9 +148,15 @@ export function CourtsScreen() {
                 {t('session.court.goToRound', { number: live.roundNumber })}
               </Button>
             ) : settled && reachedTarget ? (
-              <Button size="lg" fullWidth leftIcon={<Flag size={18} aria-hidden="true" />} onClick={() => void navigate(`/session/${session.id}/finish`)}>
-                {t('session.court.finishSession')}
-              </Button>
+              // Target played: finishing is the main action, one more round stays one tap away.
+              <>
+                <Button size="lg" variant="secondary" className="shrink-0" leftIcon={<Plus size={18} aria-hidden="true" />} onClick={next}>
+                  {t('session.court.addRound')}
+                </Button>
+                <Button size="lg" className="min-w-0 flex-1" leftIcon={<Flag size={18} aria-hidden="true" />} onClick={() => void navigate(`/session/${session.id}/finish`)}>
+                  {t('session.court.finishSession')}
+                </Button>
+              </>
             ) : (
               // Not natively disabled: a tap while matches are open says why (next() toasts the reason).
               <Button size="lg" className={cn('min-w-0 flex-1', !settled && 'opacity-45')} aria-disabled={!settled} onClick={next} leftIcon={<ArrowRight size={18} aria-hidden="true" />}>

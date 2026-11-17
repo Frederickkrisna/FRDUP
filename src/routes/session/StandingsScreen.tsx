@@ -1,11 +1,13 @@
 import { useMemo, useState } from 'react';
-import { ArrowDown, ArrowUp } from 'lucide-react';
+import { ArrowDown, ArrowUp, Eye, EyeOff } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
 import { Avatar } from '@/components/Avatar';
+import { Button } from '@/components/Button';
 import { EmptyState } from '@/components/EmptyState';
 import { cn } from '@/components/cn';
 import { computeSessionRp } from '@/core/ranking/computeRp';
+import { standingPoints } from '@/core/standings/computeStandings';
 import { initialsOf } from '@/core/utils/avatar';
 import { displayName } from '@/features/shared/people';
 import { useParticipantMap, useStandings } from '@/features/session/selectors';
@@ -13,6 +15,9 @@ import { useSessionStore } from '@/state/sessionStore';
 import type { StandingRow } from '@/core/matchmaking/types';
 
 type SortKey = 'rank' | 'matchesPlayed' | 'wins' | 'pointsFor' | 'pointDiff' | 'winRate';
+
+/** Points sort and show with the +M compensation included, like the ranking itself. */
+const value = (row: StandingRow, key: Exclude<SortKey, 'rank'>): number => (key === 'pointsFor' ? standingPoints(row) : row[key]);
 
 /**
  * Fixed widths sized for a 360px phone: the player column keeps >= 120px for the name, numbers
@@ -30,13 +35,16 @@ export function StandingsScreen() {
   const standings = useStandings();
   const byId = useParticipantMap();
   const session = useSessionStore((s) => s.session);
+  const role = useSessionStore((s) => s.role);
+  const setHidden = useSessionStore((s) => s.setStandingsHidden);
   const [sort, setSort] = useState<{ key: SortKey; dir: 'asc' | 'desc' }>({ key: 'rank', dir: 'asc' });
 
   const rows = useMemo(() => {
     const list = [...standings];
     const sign = sort.dir === 'asc' ? 1 : -1;
     // Rank order is already the plugin's order; other columns re-sort on top of it (stable).
-    if (sort.key !== 'rank') list.sort((a, b) => sign * (a[sort.key] - b[sort.key]) || a.rank - b.rank);
+    const key = sort.key;
+    if (key !== 'rank') list.sort((a, b) => sign * (value(a, key) - value(b, key)) || a.rank - b.rank);
     else if (sort.dir === 'desc') list.reverse();
     return list;
   }, [standings, sort]);
@@ -49,15 +57,34 @@ export function StandingsScreen() {
   };
 
   const hasDraws = standings.some((s) => s.draws > 0);
+  const hasComp = standings.some((s) => s.compensation !== 0);
 
   if (!session) return null;
+  const isHost = role === 'host';
+  if (session.standingsHidden) {
+    return (
+      <EmptyState
+        art="chart"
+        title={t('session.standings.hiddenTitle')}
+        body={isHost ? t('session.standings.hiddenHost') : t('session.standings.hiddenCohost')}
+        action={isHost ? <Button leftIcon={<Eye size={18} aria-hidden="true" />} onClick={() => setHidden(false)}>{t('session.standings.reveal')}</Button> : undefined}
+      />
+    );
+  }
   if (standings.every((s) => s.matchesPlayed === 0)) return <EmptyState art="chart" title={t('session.standings.noData')} body={t('session.standings.noDataBody')} />;
 
   const toggle = (key: SortKey) => setSort((s) => (s.key === key ? { key, dir: s.dir === 'desc' ? 'asc' : 'desc' } : { key, dir: 'desc' }));
   const ariaSort = (key: SortKey): 'ascending' | 'descending' | 'none' => (sort.key === key ? (sort.dir === 'asc' ? 'ascending' : 'descending') : 'none');
 
   return (
-    <div className="px-3 pt-3">
+    <div className="px-3 pt-1">
+      {isHost ? (
+        <div className="flex justify-end">
+          <Button size="sm" variant="ghost" leftIcon={<EyeOff size={16} aria-hidden="true" />} onClick={() => setHidden(true)}>
+            {t('session.standings.hide')}
+          </Button>
+        </div>
+      ) : null}
       <table className="w-full table-fixed border-separate border-spacing-0">
         <caption className="sr-only">{t('session.standings.title')}</caption>
         <thead className="sticky top-14 z-10 bg-bg">
@@ -96,8 +123,8 @@ export function StandingsScreen() {
                     <Avatar name={p.name} initials={initialsOf(p.name)} color={p.avatarColor} src={p.avatarUrl} size="xs" />
                     <div className="min-w-0 flex-1">
                       <p className="truncate font-semibold leading-tight">{displayName(p)}</p>
-                      {delta !== null ? (
-                        <p className="truncate text-[11px] leading-tight text-ink-muted" title={t('session.standings.projectedHint')}>
+                      {delta ? (
+                        <p className="truncate text-[11px] leading-tight text-ink-muted">
                           {t('session.standings.projected', { delta: delta > 0 ? `+${delta}` : String(delta) })}
                         </p>
                       ) : null}
@@ -108,14 +135,21 @@ export function StandingsScreen() {
                 <td className="num whitespace-nowrap text-center text-[13px] font-medium tracking-tight">
                   {hasDraws ? `${r.wins}-${r.losses}-${r.draws}` : `${r.wins}-${r.losses}`}
                 </td>
-                <td className="num text-center font-bold text-[14px]">{r.pointsFor}</td>
+                <td className="num text-center leading-tight">
+                  <span className="block text-[14px] font-bold">{standingPoints(r)}</span>
+                  {r.compensation !== 0 ? (
+                    <span className="block text-[11px] text-ink-muted" aria-label={t('session.standings.compensationAria', { n: r.compensation })}>
+                      {t('session.standings.compensation', { n: r.compensation > 0 ? `+${r.compensation}` : String(r.compensation) })}
+                    </span>
+                  ) : null}
+                </td>
                 <td className={cn('num rounded-r-md text-center text-[13px]', r.pointDiff > 0 ? 'text-success font-semibold' : r.pointDiff < 0 ? 'text-danger font-semibold' : 'text-ink-muted')}>{r.pointDiff > 0 ? `+${r.pointDiff}` : r.pointDiff}</td>
               </tr>
             );
           })}
         </tbody>
       </table>
-      <p className="px-2 pt-3 text-[12px] text-ink-faint">{t('session.standings.projectedHint')}</p>
+      {hasComp ? <p className="px-2 pt-3 text-[12px] text-ink-faint">{t('session.standings.compensationHint')}</p> : null}
     </div>
   );
 }

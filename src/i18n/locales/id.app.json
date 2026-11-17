@@ -302,11 +302,12 @@
       "roundPill": "Ronde {{number}}",
       "roundPillLive": "Ronde {{number}}, sedang berjalan",
       "progress": "{{done}}/{{total}} selesai",
-      "pastRoundNote": "Ini ronde yang sudah lewat. Skor yang kamu ubah di sini langsung mengubah klasemen.",
       "pickFor": "Ketuk skor {{team}}, langsung tersimpan",
       "setScore": "Skor {{team}} jadi {{value}}",
       "goToRound": "Ke Ronde {{number}}",
-      "roundPillDone": "Ronde {{number}}, selesai"
+      "roundPillDone": "Ronde {{number}}, selesai",
+      "undoScore": "Salah skor?",
+      "addRound": "Tambah Ronde"
     },
     "standings": {
       "noDataBody": "Klasemen muncul setelah pertandingan pertama selesai.",
@@ -316,10 +317,17 @@
       "pointsFull": "Urutkan berdasarkan poin",
       "diffFull": "Urutkan berdasarkan selisih",
       "projected": "perkiraan {{delta}} RP",
-      "projectedHint": "RP di sini hanya perkiraan dan bisa berubah sampai sesi selesai.",
       "playedShort": "Main",
       "record": "M-K",
-      "recordDraws": "M-K-S"
+      "recordDraws": "M-K-S",
+      "compensation": "{{n}}M",
+      "compensationHint": "M = poin kompensasi untuk yang main lebih sedikit (rata-rata poinnya per main), sudah masuk ke Poin.",
+      "hide": "Sembunyikan",
+      "reveal": "Tampilkan klasemen",
+      "hiddenTitle": "Klasemen disembunyikan",
+      "hiddenHost": "Tidak terlihat di HP mana pun sampai kamu tampilkan.",
+      "hiddenCohost": "Host akan menampilkannya saat hasil diumumkan.",
+      "compensationAria": "termasuk {{n}} poin kompensasi"
     },
     "finish": {
       "doneTitle": "Sesi selesai",
@@ -349,7 +357,15 @@
       "editScores": "Edit skor",
       "closeSession": "Tutup sesi",
       "reopenTitle": "Edit skor sesi ini?",
-      "reopenBody": "Peringkat yang sudah dihitung dibatalkan dulu, lalu dihitung ulang saat kamu menyelesaikan sesi lagi."
+      "reopenBody": "Peringkat yang sudah dihitung dibatalkan dulu, lalu dihitung ulang saat kamu menyelesaikan sesi lagi.",
+      "pdf": {
+        "button": "Unduh PDF",
+        "rounds": "Jadwal & Skor",
+        "rest": "Istirahat: {{names}}",
+        "compensation": "+M",
+        "footer": "Rekap sesi dari FRDUP",
+        "failed": "Gagal membuat PDF. Coba lagi."
+      }
     }
   },
   "bill": {

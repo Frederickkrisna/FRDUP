@@ -1,7 +1,8 @@
 /** computeStandings tests — aggregation, ranking, rest tracking. */
 
 import { describe, it, expect } from 'vitest';
-import { computeStandings } from '../computeStandings';
+import { computeStandings, standingPoints } from '../computeStandings';
+import { badmintonPlugin } from '@/core/sports/badminton';
 import { padelPlugin } from '@/core/sports/padel';
 import type { SessionParticipant } from '@/types/session';
 import type { RoundDoc, Match } from '@/types/round';
@@ -127,14 +128,18 @@ describe('computeStandings', () => {
   });
 
   it('padel sorts by points scored first, before wins and diff', () => {
-    // P: 1W 1L, 21 points, diff 0.  Q: 1W 0L, 11 points, diff +1.
-    // Sorting by wins/diff alone would rank Q above P; the plugin says points come first.
-    const participants = ['P', 'A', 'B', 'C', 'D', 'Q', 'E'].map(participant);
-    const r1 = round(1, [completedMatch('m1', 'c1', [['P', 'A'], ['B', 'C']], [11, 10])]);
-    const r2 = round(2, [completedMatch('m2', 'c1', [['P', 'D'], ['Q', 'E']], [10, 11])]);
+    // Both play twice (no +M). P: 0W 2L, 20 points.  Q: 1W 1L, 11 points.
+    // Sorting by wins alone would rank Q above P; the plugin says points come first.
+    const participants = ['P', 'A', 'B', 'C', 'D', 'Q', 'E', 'F'].map(participant);
+    const r1 = round(1, [completedMatch('m1', 'c1', [['P', 'A'], ['Q', 'B']], [10, 11])]);
+    const r2 = round(2, [
+      completedMatch('m2', 'c1', [['P', 'C'], ['D', 'E']], [10, 11]),
+      completedMatch('m3', 'c2', [['Q', 'A'], ['B', 'F']], [0, 21]),
+    ]);
     const rows = computeStandings(participants, [r1, r2], padelPlugin, spec);
     const rankOf = (id: string) => rows.find((r) => r.playerId === id)!.rank;
     expect(rows.every((r) => Number.isFinite(r.rank))).toBe(true);
+    expect(rows.find((r) => r.playerId === 'P')?.compensation).toBe(0);
     expect(rankOf('P')).toBeLessThan(rankOf('Q'));
   });
 
@@ -147,5 +152,38 @@ describe('computeStandings', () => {
     expect(a.matchesPlayed).toBe(2);
     expect(a.wins).toBe(1);
     expect(a.winRate).toBeCloseTo(0.5);
+  });
+});
+
+describe('+M compensation (points-first sports)', () => {
+  // E rests in round 2 and plays round 1 + 3; everyone else plays two of three.
+  const participants = ['A', 'B', 'C', 'D', 'E'].map(participant);
+  const rounds = [
+    round(1, [completedMatch('m1', 'c1', [['A', 'B'], ['C', 'D']], [15, 6])], ['E']),
+    round(2, [completedMatch('m2', 'c1', [['A', 'C'], ['B', 'E']], [10, 11])], ['D']),
+    round(3, [completedMatch('m3', 'c1', [['A', 'D'], ['C', 'E']], [12, 9])], ['B']),
+  ];
+
+  it('credits each missed match at the player own average, and ranks on the total', () => {
+    const rows = computeStandings(participants, rounds, padelPlugin, spec);
+    const by = new Map(rows.map((r) => [r.playerId, r]));
+    expect(by.get('A')?.compensation).toBe(0); // played all 3
+    expect(by.get('B')?.compensation).toBe(13); // 15 + 11 in 2: avg 13, 1 missed
+    expect(by.get('E')?.compensation).toBe(10); // 11 + 9 in 2: avg 10
+    expect(by.get('C')?.compensation).toBe(0); // played all 3: 6 + 10 + 9
+    expect(standingPoints(by.get('B') ?? { pointsFor: 0, compensation: 0 })).toBe(39);
+    // B (26 + 13 = 39) passes A (15 + 10 + 12 = 37) only thanks to +M.
+    expect(rows[0]?.playerId).toBe('B');
+  });
+
+  it('nobody is compensated when everyone played the same number of matches', () => {
+    const rows = computeStandings(participants.slice(0, 4), [rounds[0] as RoundDoc], padelPlugin, spec);
+    expect(rows.every((r) => r.compensation === 0)).toBe(true);
+  });
+
+  it('wins-first sports never compensate', () => {
+    const bSpec = badmintonPlugin.buildScoreInput({});
+    const rows = computeStandings(participants, rounds, badmintonPlugin, bSpec);
+    expect(rows.every((r) => r.compensation === 0)).toBe(true);
   });
 });

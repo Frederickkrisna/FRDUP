@@ -147,10 +147,7 @@ function ExportSheetBase({
     const filename = exportFilename(kind, sportId, dateIso, format);
     const shareText = t('export.shareText', { title: shareTitle, sport: sportName, brand });
     void withRender(async (card) => {
-      const outcome = await shareCard(card, filename, shareText);
-      if (outcome === 'shared') toast.success(t('export.toast.shared'));
-      else if (outcome === 'downloaded') toast.success(t('export.toast.downloaded'));
-      else toast.info(t('export.toast.cancelled'));
+      await shareCard(card, filename, shareText);
     });
   }, [kind, sportId, dateIso, format, t, shareTitle, sportName, brand, withRender]);
 
@@ -158,9 +155,8 @@ function ExportSheetBase({
     const filename = exportFilename(kind, sportId, dateIso, format);
     void withRender(async (card) => {
       downloadCard(card, filename);
-      toast.success(t('export.toast.downloaded'));
     });
-  }, [kind, sportId, dateIso, format, t, withRender]);
+  }, [kind, sportId, dateIso, format, withRender]);
 
   const preview = renderBody(template, format);
 

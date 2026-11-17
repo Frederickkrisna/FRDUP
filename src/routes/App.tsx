@@ -44,7 +44,6 @@ export function App() {
     void registerPwa({
       updateMessage: t('pwa.updateAvailable'),
       updateAction: t('pwa.updateAction'),
-      offlineReady: t('pwa.offlineReady'),
     });
     return dispose;
     // Run once for the app lifetime; labels are read at registration time.

@@ -24,6 +24,8 @@ export async function startBadmintonSession(page: Page) {
   await expect(page.getByText('9 pemain dipilih')).toBeVisible();
   await page.getByRole('button', { name: 'Lanjut' }).click();
   await expect(page.getByText('9 pemain, 2 lapangan → 8 main, 1 istirahat tiap ronde')).toBeVisible();
+  // Open-ended keeps the round-by-round flow ("Ronde Berikutnya"); schedule.spec covers the default "Otomatis".
+  await page.getByRole('button', { name: 'Tanpa Batas' }).click();
   await page.getByRole('button', { name: 'Lanjut' }).click();
   await page.getByRole('button', { name: 'Mulai Sesi' }).click();
   await expect(page).toHaveURL(/\/session\/[^/]+\/courts/);

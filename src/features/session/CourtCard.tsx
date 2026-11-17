@@ -81,7 +81,7 @@ export const CourtCard = memo(function CourtCard({ court, roundId, locked, onOpe
   const finish = () => {
     completeMatch(roundId, match.id);
     haptic('success');
-    toast.undo(t('session.court.completedToast', { court: court.label }), t('common.undo'), () => undoLast());
+    toast.undo(t('session.court.undoScore'), t('common.undo'), () => undoLast());
   };
 
   const statusLabel =

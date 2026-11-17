@@ -57,7 +57,6 @@ export function PublicBoardScreen() {
           text: t('board.public.shareText', { sport: sportName }),
           url,
         });
-        toast.success(t('session.finish.linkShared'));
         return;
       } catch (err) {
         if ((err as Error).name === 'AbortError') return;
@@ -65,7 +64,7 @@ export function PublicBoardScreen() {
     }
     try {
       await navigator.clipboard.writeText(url);
-      toast.success(t('board.public.copied'));
+      toast.info(t('board.public.copied'));
     } catch {
       toast.danger(t('session.finish.shareFailed'));
     }

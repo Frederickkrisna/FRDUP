@@ -13,6 +13,8 @@ test('8-round Americano: rounds pre-built, one-tap padel score, unplayed rounds 
   await page.getByRole('button', { name: 'Padel' }).click();
   await page.getByRole('button', { name: 'Pilih semua' }).click();
   await page.getByRole('button', { name: 'Lanjut' }).click();
+  // Default: a full Americano, every partnership once. 9 players on 2 courts: 36 / 4 = 9 rounds.
+  await expect(page.getByRole('button', { name: 'Otomatis (9 ronde)' })).toHaveAttribute('aria-pressed', 'true');
   await page.getByRole('button', { name: /^2 Jam/ }).click(); // courts step: ~8 rounds
   await page.getByRole('button', { name: 'Lanjut' }).click();
   await page.getByRole('button', { name: 'Mulai Sesi' }).click(); // format step: Americano is the default
@@ -52,3 +54,32 @@ test('8-round Americano: rounds pre-built, one-tap padel score, unplayed rounds 
   // WebKit against the emulator (docs/progress.md, open question 16).
   await expect(page.getByRole('heading', { name: 'Sesi selesai' })).toBeVisible({ timeout: 30_000 });
 });
+
+test('target reached: one more round on demand, then finish', async ({ page }) => {
+  test.setTimeout(120_000);
+  await onboard(page);
+
+  await page.getByRole('button', { name: 'Mulai Sesi' }).click();
+  await page.getByRole('button', { name: 'Padel' }).click();
+  await page.getByRole('button', { name: 'Pilih semua' }).click();
+  await page.getByRole('button', { name: 'Lanjut' }).click();
+  await page.getByRole('button', { name: /^1 Jam/ }).click(); // 4 rounds, then down to 1
+  for (let i = 0; i < 3; i++) await page.getByRole('button', { name: 'Kurangi' }).last().click();
+  await expect(page.getByText('1 Ronde', { exact: true })).toBeVisible();
+  await page.getByRole('button', { name: 'Lanjut' }).click();
+  await page.getByRole('button', { name: 'Mulai Sesi' }).click();
+  await expect(page).toHaveURL(/\/session\/[^/]+\/courts/);
+
+  for (const i of [0, 1]) {
+    await court(page, i).getByRole('button', { name: /^Buka papan skor/ }).first().click();
+    await page.getByRole('dialog').getByRole('button', { name: /jadi 15$/ }).click();
+  }
+
+  // Target played: finishing is the main action, "Tambah Ronde" plays one more.
+  await expect(page.getByRole('button', { name: 'Selesaikan sesi', exact: true })).toBeVisible();
+  await page.getByRole('button', { name: 'Tambah Ronde' }).click();
+  await expect(page.getByRole('heading', { name: 'Ronde 2', exact: true })).toBeVisible();
+  await expect(page.getByText('/2', { exact: true })).toBeVisible();
+  await expect(page.locator('article')).toHaveCount(2);
+});
+

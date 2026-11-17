@@ -122,15 +122,12 @@
         "title": "Pengaturan Lapangan",
         "count": "Jumlah Lapangan",
         "label": "Label",
-        "targetRounds": "Target Ronde",
-        "targetRoundsHint": "Pilih durasi sewa lapangan atau tentukan jumlah ronde",
+        "targetRounds": "Jumlah Ronde",
         "duration": "Durasi",
         "openEnded": "Tanpa Batas",
         "fairnessPreview": "{{players}} pemain, {{courts}} lapangan → {{playing}} main, {{resting}} istirahat tiap ronde",
-        "countHint": "Maks {{max}} lapangan",
         "labelN": "Label {{n}}",
         "underfilled": "Butuh min {{needed}} pemain per lapangan — hanya {{active}} lapangan aktif",
-        "restNote": "Pemain istirahat dirotasi setiap ronde",
         "preset1h": "1 Jam",
         "preset1h5": "1.5 Jam",
         "preset2h": "2 Jam",
@@ -138,8 +135,8 @@
         "preset3h": "3 Jam",
         "presetRounds": "~{{n}} ronde",
         "customRounds": "{{n}} Ronde",
-        "customEstimate": "Estimasi ~{{min}} menit (bisa diakhiri kapan saja)",
-        "openEndedNote": "Mode tanpa batas: Main sebanyak ronde yang diinginkan, lalu akhiri sesi kapan saja."
+        "auto": "Otomatis ({{n}} ronde)",
+        "autoHint": "Sampai semua pemain pernah bertemu"
       },
       "format": {
         "title": "Format Permainan",

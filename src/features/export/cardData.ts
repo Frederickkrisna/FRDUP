@@ -6,6 +6,7 @@ import type { StandingRow } from '@/core/matchmaking/types';
 import type { AllTimeRow } from '@/core/leaderboard/allTime';
 import type { RankChange } from '@/core/session/finish';
 import { getSportPlugin } from '@/core/sports/registry';
+import { standingPoints } from '@/core/standings/computeStandings';
 import { initialsOf } from '@/core/utils/avatar';
 import { formatDateWithDay, toIsoDate } from '@/core/utils/date';
 import type { SessionDoc } from '@/types/session';
@@ -49,7 +50,7 @@ export function sessionCardData(args: {
         nickname: p?.nickname ?? null,
         initials: initialsOf(p?.name ?? '?'),
         avatarColor: p?.avatarColor ?? 'transparent',
-        primaryValue: num.format(first === 'points' ? s.pointsFor : first === 'wins' ? s.wins : s.pointDiff),
+        primaryValue: num.format(first === 'points' ? standingPoints(s) : first === 'wins' ? s.wins : s.pointDiff),
         secondary: t('board.record', { wins: s.wins, losses: s.losses, diff }),
         tier: change ? { key: change.to.tier, division: change.to.division, stars: change.to.stars } : null,
         rpDelta: change ? change.delta : null,

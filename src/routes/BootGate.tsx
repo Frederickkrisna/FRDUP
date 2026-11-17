@@ -100,9 +100,6 @@ export function BootGate({ children }: { children: React.ReactNode }) {
           if (!file) return;
           setRestoring(true);
           restoreFromBackupFile(file)
-            .then(() => {
-              toast.success(t('settings.data.restoreDone'));
-            })
             .catch(() => toast.danger(t('settings.data.restoreFailed')))
             .finally(() => setRestoring(false));
         }}

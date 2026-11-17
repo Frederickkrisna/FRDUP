@@ -1,6 +1,6 @@
 import { useEffect, useState, useSyncExternalStore } from 'react';
 
-import { toast } from '@/components/toast/toastStore';
+import { useToastStore } from '@/components/toast/toastStore';
 
 /* ------------------------------------------------------------------ service worker */
 
@@ -17,18 +17,16 @@ function emit(): void {
  * Registers the service worker (precaches the app shell for offline use). The update is "prompt"
  * mode on purpose: a new build must never reload the page mid-session; the user taps to refresh.
  */
-export async function registerPwa(labels: { updateMessage: string; updateAction: string; offlineReady: string }): Promise<void> {
+export async function registerPwa(labels: { updateMessage: string; updateAction: string }): Promise<void> {
   if (!('serviceWorker' in navigator) || import.meta.env.DEV) return;
   const { registerSW } = await import('virtual:pwa-register');
   updateSW = registerSW({
     immediate: true,
+    // No "ready to work offline" toast: nobody needs to know, it just works.
     onNeedRefresh() {
       needRefresh = true;
       emit();
-      toast.undo(labels.updateMessage, labels.updateAction, () => void updateSW?.(true));
-    },
-    onOfflineReady() {
-      toast.success(labels.offlineReady);
+      useToastStore.getState().show({ kind: 'info', message: labels.updateMessage, actionLabel: labels.updateAction, onAction: () => void updateSW?.(true), durationMs: 10_000 });
     },
   });
 }

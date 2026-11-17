@@ -31,6 +31,11 @@ export interface StandingRow {
   pointDiff: number;
   winRate: number;
   restCount: number;
+  /**
+   * +M: points credited for matches a player missed against the most-played player, at their own
+   * average per match. Only for sports that rank on points first; 0 otherwise. See standingPoints().
+   */
+  compensation: number;
 }
 
 export interface CostWeights {

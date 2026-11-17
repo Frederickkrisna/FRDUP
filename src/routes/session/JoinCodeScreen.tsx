@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { Download, Link2, RefreshCw, Share2, Smartphone, TriangleAlert, WifiOff } from 'lucide-react';
+import { Check, Download, Link2, RefreshCw, Share2, Smartphone, TriangleAlert, WifiOff } from 'lucide-react';
 import { QRCodeCanvas, QRCodeSVG } from 'qrcode.react';
 import { useNavigate, useParams } from 'react-router';
 import { useTranslation } from 'react-i18next';
@@ -11,9 +11,9 @@ import { toast } from '@/components/toast/toastStore';
 import { cn } from '@/components/cn';
 import { isJoinCodeLive } from '@/core/session/joinCode';
 import { sessionRepo } from '@/data/sessionRepo';
-import { copyText } from '@/features/billing/billExport';
 import { downloadJoinQr, joinQrFilename, joinQrPng, shareJoin } from '@/features/session/joinQr';
 import { isLoopbackOrigin, publicUrl } from '@/features/shared/publicUrl';
+import { useCopied } from '@/features/shared/useCopied';
 import { useNow } from '@/features/shared/useNow';
 import { useBootStore } from '@/state/bootStore';
 import { useSessionStore } from '@/state/sessionStore';
@@ -32,6 +32,7 @@ function formatCountdown(expiresAt: number | null, now: number): string {
 
 export function JoinCodeScreen() {
   const { t } = useTranslation();
+  const [copied, copy] = useCopied(t('bill.copyFailed'));
   const navigate = useNavigate();
   const { sessionId } = useParams();
   const session = useSessionStore((s) => s.session);
@@ -86,7 +87,7 @@ export function JoinCodeScreen() {
     setSharing(true);
     try {
       const outcome = await shareJoin({ title: t('common.appName'), text: t('cohost.shareText', { code }), link, image: await qrImage(), filename: joinQrFilename(code) });
-      if (outcome === 'copied') toast.success(t('cohost.shareCopied'));
+      if (outcome === 'copied') toast.info(t('cohost.shareCopied')); // shared as a copy instead: say so
       else if (outcome === 'failed') toast.danger(t('bill.copyFailed'));
     } finally {
       setSharing(false);
@@ -101,7 +102,6 @@ export function JoinCodeScreen() {
       return;
     }
     downloadJoinQr(image, joinQrFilename(code));
-    toast.success(t('cohost.qrSaved'));
   };
 
   return (
@@ -147,10 +147,10 @@ export function JoinCodeScreen() {
               <div className="grid grid-cols-2 gap-2">
                 <Button
                   variant="secondary"
-                  leftIcon={<Link2 size={16} aria-hidden="true" />}
-                  onClick={() => void copyText(link).then((ok) => (ok ? toast.success(t('common.copied')) : toast.danger(t('bill.copyFailed'))))}
+                  leftIcon={copied ? <Check size={16} aria-hidden="true" /> : <Link2 size={16} aria-hidden="true" />}
+                  onClick={() => copy(link)}
                 >
-                  {t('cohost.copyLink')}
+                  {copied ? t('common.copied') : t('cohost.copyLink')}
                 </Button>
                 <Button variant="secondary" leftIcon={<Download size={16} aria-hidden="true" />} onClick={() => void saveQr()}>
                   {t('cohost.saveQr')}

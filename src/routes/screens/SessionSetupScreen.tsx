@@ -6,7 +6,7 @@ import { Button } from '@/components/Button';
 import { ScreenHeader } from '@/components/ScreenHeader';
 import { toast } from '@/components/toast/toastStore';
 import { getSportPlugin } from '@/core/sports/registry';
-import { LIMITS, playersPerMatch, resolveMatchShape } from '@/core/session/sessionEngine';
+import { LIMITS, estimateRounds, playersPerMatch, resolveMatchShape } from '@/core/session/sessionEngine';
 import { SetupCourtsStep, defaultCourtLabel } from '@/features/session/setup/SetupCourtsStep';
 import { SetupFormatStep } from '@/features/session/setup/SetupFormatStep';
 import { SetupPlayersStep } from '@/features/session/setup/SetupPlayersStep';
@@ -76,7 +76,7 @@ export function SessionSetupScreen() {
       title: draft.title.trim() || null,
       venue: draft.venue.trim() || null,
       courts: Array.from({ length: courtCount }, (_, i) => ({ label: (draft.courtLabels[i] ?? defaultCourtLabel(noun, i)).trim() || defaultCourtLabel(noun, i) })),
-      targetRounds: draft.targetRounds,
+      targetRounds: draft.targetRounds === 'auto' ? estimateRounds(selected.length, courtCount, shape) : draft.targetRounds,
       sportConfig: config,
       scoreInput: plugin.buildScoreInput(config),
       participants: selected.map(participantFromPlayer),

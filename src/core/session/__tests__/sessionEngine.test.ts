@@ -13,6 +13,7 @@ import {
   courtsForRound,
   completionBlocker,
   eligiblePlayerIds,
+  estimateRounds,
   isRoundUntouched,
   liveRound,
   plansAllRounds,
@@ -208,6 +209,27 @@ describe('participants and courts', () => {
     // A court switched on mid-round has no match yet, so it is not shown until a round uses it.
     const small = buildNextRound({ session: off, rounds: [], plugin, seed: 5, uid: 'h', now: 3 });
     expect(courtsForRound(s, small).map((c) => c.id)).toEqual(['c1']);
+  });
+});
+
+describe('estimateRounds (full Americano)', () => {
+  const doubles = { teamsPerMatch: 2, playersPerTeam: 2 };
+  it('every partnership once: 13 on 2 courts = 19, 8 on 2 courts = 7, 9 on 2 courts = 9', () => {
+    expect(estimateRounds(13, 2, doubles)).toBe(19);
+    expect(estimateRounds(8, 2, doubles)).toBe(7);
+    expect(estimateRounds(9, 2, doubles)).toBe(9);
+  });
+  it('more courts than the roster fills only counts the courts in play', () => {
+    expect(estimateRounds(5, 3, doubles)).toBe(estimateRounds(5, 1, doubles));
+  });
+  it('singles and Mahjong count opponent pairings', () => {
+    expect(estimateRounds(4, 2, { teamsPerMatch: 2, playersPerTeam: 1 })).toBe(3);
+    expect(estimateRounds(8, 2, { teamsPerMatch: 4, playersPerTeam: 1 })).toBe(2);
+  });
+  it('never below 1, never above the round limit', () => {
+    expect(estimateRounds(3, 2, doubles)).toBe(1);
+    expect(estimateRounds(4, 1, doubles)).toBe(3);
+    expect(estimateRounds(64, 1, doubles)).toBe(LIMITS.rounds);
   });
 });
 

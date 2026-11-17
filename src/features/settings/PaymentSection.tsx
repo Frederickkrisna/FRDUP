@@ -26,7 +26,6 @@ export function PaymentSection({ host }: { host: HostDoc }) {
     setBusy(true);
     try {
       save({ qrisImageUrl: await compressToDataUrl(file) });
-      toast.success(t('settings.payment.qrisSaved'));
     } catch (error) {
       toast.danger(error instanceof ImageTooLargeError ? t('settings.payment.qrisTooLarge') : t('settings.payment.qrisFailed'));
     } finally {

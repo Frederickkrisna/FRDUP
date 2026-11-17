@@ -10,6 +10,8 @@ export interface ToastItem {
   actionLabel?: string;
   onAction?: () => void;
   durationMs: number;
+  /** A new toast with the same key replaces the old one instead of stacking. */
+  key?: string;
 }
 
 interface ToastState {
@@ -25,7 +27,7 @@ export const useToastStore = create<ToastState>()((set) => ({
   items: [],
   show: (t) => {
     const id = ++seq;
-    set((s) => ({ items: [...s.items, { durationMs: 5000, ...t, id }].slice(-MAX_VISIBLE) }));
+    set((s) => ({ items: [...s.items.filter((i) => !t.key || i.key !== t.key), { durationMs: 5000, ...t, id }].slice(-MAX_VISIBLE) }));
     return id;
   },
   dismiss: (id) => set((s) => ({ items: s.items.filter((i) => i.id !== id) })),
@@ -38,5 +40,6 @@ export const toast = {
   warning: (message: string) => useToastStore.getState().show({ kind: 'warning', message }),
   danger: (message: string) => useToastStore.getState().show({ kind: 'danger', message }),
   undo: (message: string, actionLabel: string, onAction: () => void) =>
-    useToastStore.getState().show({ kind: 'info', message, actionLabel, onAction, durationMs: 5000 }),
+    // Undo only ever reverts the latest step, so one undo toast at a time.
+    useToastStore.getState().show({ kind: 'info', message, actionLabel, onAction, durationMs: 4000, key: 'undo' }),
 };

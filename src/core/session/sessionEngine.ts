@@ -48,6 +48,22 @@ export function rotationPreview(playerCount: number, courts: number, shape: Matc
   return { playing, resting: playerCount - playing, activeCourts };
 }
 
+/**
+ * Rounds for a full Americano: every partnership once (doubles), or every opponent pairing once
+ * (singles, Mahjong). 13 players on 2 padel courts: 78 partnerships, 4 per round, so 19 rounds.
+ * Rounded down: the last partial round would leave most players idle; the host can add one.
+ */
+export function estimateRounds(playerCount: number, courts: number, shape: MatchShape): number {
+  const { activeCourts } = rotationPreview(playerCount, courts, shape);
+  if (activeCourts === 0) return 1;
+  const pairs = (playerCount * (playerCount - 1)) / 2;
+  const perMatch =
+    shape.playersPerTeam >= 2
+      ? (shape.teamsPerMatch * shape.playersPerTeam * (shape.playersPerTeam - 1)) / 2
+      : (shape.teamsPerMatch * (shape.teamsPerMatch - 1)) / 2;
+  return Math.min(LIMITS.rounds, Math.max(1, Math.floor(pairs / (perMatch * activeCourts))));
+}
+
 /* ------------------------------------------------------------------ eligibility */
 
 export function isEligibleForRound(p: SessionParticipant, roundNumber: number): boolean {

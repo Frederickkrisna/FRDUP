@@ -6,7 +6,6 @@ import { ArrowRight } from 'lucide-react';
 import { Button } from '@/components/Button';
 import { Chip } from '@/components/Chip';
 import { TextField } from '@/components/TextField';
-import { toast } from '@/components/toast/toastStore';
 import { parseBulkNames } from '@/core/utils/avatar';
 import { hostRepo, rosterRepo } from '@/data/hostRosterRepo';
 import { signInWithCredentials } from '@/data/authRepo';
@@ -65,7 +64,6 @@ export function OnboardingScreen() {
       const hostDisplayName = cleanUser.toLowerCase() === 'fred' ? 'Fred' : cleanUser;
       await hostRepo.ensureHost(authedUid, hostDisplayName, deviceLabel());
       setHost(authedUid, hostDisplayName);
-      toast.success(`Berhasil masuk sebagai ${hostDisplayName}`);
       setStep(2);
     } catch (err: unknown) {
       const e = err as { message?: string };

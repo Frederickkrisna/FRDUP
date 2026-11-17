@@ -82,8 +82,7 @@ export function ScoreSheet({ roundId, matchId, onClose }: { roundId: Id; matchId
     const saved = useSessionStore.getState().rounds.find((r) => r.id === roundId)?.matches.find((m) => m.id === matchId);
     if (saved?.status !== 'completed') return; // e.g. a tie on an even total: stay open, the blocker below says why
     haptic('success');
-    const court = session.courts.find((c) => c.id === saved.courtId)?.label ?? '';
-    toast.undo(t('session.court.completedToast', { court }), t('common.undo'), () => undoLast());
+    toast.undo(t('session.court.undoScore'), t('common.undo'), () => undoLast());
     onClose();
   };
 
@@ -281,14 +280,9 @@ export function SwapSheet({ roundId, playerId, onClose }: { roundId: Id; playerI
   }));
   const groups = (selfResting ? courtGroups : [bench, ...courtGroups]).filter((g) => g.ids.length > 0);
 
-  const pick = (otherId: Id, fromBench: boolean) => {
-    const other = byId.get(otherId);
-    const otherName = other ? displayName(other) : '';
+  const pick = (otherId: Id) => {
     swap(roundId, playerId, otherId);
     haptic('medium');
-    if (selfResting) toast.success(t('session.court.benchSwapDone', { inn: selfName, out: otherName }));
-    else if (fromBench) toast.success(t('session.court.benchSwapDone', { inn: otherName, out: selfName }));
-    else toast.success(t('session.court.swapDone', { a: selfName, b: otherName }));
     onClose();
   };
 
@@ -302,7 +296,7 @@ export function SwapSheet({ roundId, playerId, onClose }: { roundId: Id; playerI
             <ul className="flex flex-col gap-1.5">
               {g.ids.map((id) => (
                 <li key={id}>
-                  <PlayerButton id={id} disabled={g.locked || ownSettled} onClick={() => pick(id, g.key === 'bench')} />
+                  <PlayerButton id={id} disabled={g.locked || ownSettled} onClick={() => pick(id)} />
                 </li>
               ))}
             </ul>
@@ -334,7 +328,6 @@ export function SubstituteSheet({ roundId, playerId, onClose }: { roundId: Id; p
     if (add) addParticipant(add);
     substitute(roundId, playerId, inId);
     haptic('medium');
-    toast.success(t('session.court.substituteDone', { out: self ? displayName(self) : '', inn: add ? displayName(add) : displayName(byId.get(inId) ?? { name: '?', nickname: null }) }));
     onClose();
   };
 

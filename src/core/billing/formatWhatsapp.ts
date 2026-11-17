@@ -9,6 +9,7 @@ import type { SessionDoc } from '@/types/session';
 import type { BillDoc } from '@/types/bill';
 import type { HostDoc } from '@/types/host';
 import type { StandingRow } from '@/core/matchmaking/types';
+import { standingPoints } from '@/core/standings/computeStandings';
 import { formatIdr } from '@/core/utils/idr';
 import { formatDateWithDay } from '@/core/utils/date';
 
@@ -73,8 +74,8 @@ export function formatWhatsappMessage({
     const emoji = PODIUM[row.rank] ?? `${row.rank}.`;
     const name = pidToName.get(row.playerId) ?? row.playerId;
     const stats = locale === 'id'
-      ? `${row.pointsFor} poin (${row.wins}M-${row.losses}K)`
-      : `${row.pointsFor} pts (${row.wins}W-${row.losses}L)`;
+      ? `${standingPoints(row)} poin (${row.wins}M-${row.losses}K)`
+      : `${standingPoints(row)} pts (${row.wins}W-${row.losses}L)`;
     lines.push(`${emoji} ${name} — ${stats}`);
   }
 

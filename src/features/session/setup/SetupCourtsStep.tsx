@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { Stepper } from '@/components/Stepper';
 import { TextField } from '@/components/TextField';
 import { Chip } from '@/components/Chip';
-import { LIMITS, playersPerMatch, rotationPreview } from '@/core/session/sessionEngine';
+import { LIMITS, estimateRounds, playersPerMatch, rotationPreview } from '@/core/session/sessionEngine';
 import { useSetupDraft } from '@/features/shared/people';
 import type { MatchShape, SportPlugin } from '@/types/sport';
 
@@ -12,6 +12,14 @@ type Props = {
   playerCount: number;
   shape: MatchShape;
 };
+
+const PRESETS = [
+  { key: 'session.setup.courts.preset1h', rounds: 4 },
+  { key: 'session.setup.courts.preset1h5', rounds: 6 },
+  { key: 'session.setup.courts.preset2h', rounds: 8 },
+  { key: 'session.setup.courts.preset2h5', rounds: 10 },
+  { key: 'session.setup.courts.preset3h', rounds: 12 },
+] as const;
 
 /** Default labels: "Lapangan 1", "Meja 2"… The label noun comes from the plugin. */
 export function defaultCourtLabel(noun: string, index: number): string {
@@ -31,13 +39,14 @@ export function SetupCourtsStep({ plugin, playerCount, shape }: Props) {
   const preview = rotationPreview(playerCount, courtCount, shape);
   const per = playersPerMatch(shape);
   const underfilled = preview.activeCourts < courtCount;
+  const estimate = estimateRounds(playerCount, courtCount, shape);
+  const rounds = targetRounds === 'auto' ? estimate : targetRounds;
 
   return (
     <div className="flex flex-col gap-6">
       <section className="flex items-center justify-between gap-4">
         <div>
           <h2 className="text-[17px] font-bold">{t('session.setup.courts.count', { noun })}</h2>
-          <p className="text-[13px] text-ink-muted">{t('session.setup.courts.countHint', { max: LIMITS.courts })}</p>
         </div>
         <Stepper
           value={courtCount}
@@ -55,7 +64,6 @@ export function SetupCourtsStep({ plugin, playerCount, shape }: Props) {
           {t('session.setup.courts.fairnessPreview', { players: playerCount, courts: courtCount, playing: preview.playing, resting: preview.resting })}
         </p>
         {underfilled ? <p className="mt-1.5 text-[13px] text-warning">{t('session.setup.courts.underfilled', { needed: per, active: preview.activeCourts })}</p> : null}
-        {preview.resting > 0 && preview.activeCourts > 0 ? <p className="mt-1.5 text-[13px] text-ink-muted">{t('session.setup.courts.restNote')}</p> : null}
       </section>
 
       <section aria-labelledby="court-labels">
@@ -80,44 +88,32 @@ export function SetupCourtsStep({ plugin, playerCount, shape }: Props) {
       </section>
 
       <section aria-labelledby="target-rounds" className="flex flex-col gap-3">
-        <div className="flex items-center justify-between gap-4">
-          <div>
-            <h2 id="target-rounds" className="text-[17px] font-bold">
-              {t('session.setup.courts.targetRounds')}
-            </h2>
-            <p className="text-[13px] text-ink-muted">{t('session.setup.courts.targetRoundsHint')}</p>
-          </div>
-          <Chip selected={targetRounds === null} onClick={() => patch({ targetRounds: targetRounds === null ? 8 : null })}>
+        <h2 id="target-rounds" className="text-[17px] font-bold">
+          {t('session.setup.courts.targetRounds')}
+        </h2>
+
+        <div className="flex flex-wrap gap-2">
+          <Chip selected={targetRounds === 'auto'} onClick={() => patch({ targetRounds: 'auto' })}>
+            {t('session.setup.courts.auto', { n: estimate })}
+          </Chip>
+          {PRESETS.map((preset) => (
+            <Chip key={preset.rounds} selected={targetRounds === preset.rounds} onClick={() => patch({ targetRounds: preset.rounds })}>
+              {`${t(preset.key)} (${t('session.setup.courts.presetRounds', { n: preset.rounds })})`}
+            </Chip>
+          ))}
+          <Chip selected={targetRounds === null} onClick={() => patch({ targetRounds: null })}>
             {t('session.setup.courts.openEnded')}
           </Chip>
         </div>
 
-        <div className="flex flex-wrap gap-2">
-          {[
-            { key: 'session.setup.courts.preset1h', rounds: 4 },
-            { key: 'session.setup.courts.preset1h5', rounds: 6 },
-            { key: 'session.setup.courts.preset2h', rounds: 8 },
-            { key: 'session.setup.courts.preset2h5', rounds: 10 },
-            { key: 'session.setup.courts.preset3h', rounds: 12 },
-          ].map((preset) => (
-            <Chip
-              key={preset.rounds}
-              selected={targetRounds === preset.rounds}
-              onClick={() => patch({ targetRounds: preset.rounds })}
-            >
-              {`${t(preset.key)} (${t('session.setup.courts.presetRounds', { n: preset.rounds })})`}
-            </Chip>
-          ))}
-        </div>
-
-        {targetRounds !== null ? (
-          <div className="mt-1 flex items-center justify-between gap-4 rounded-md border border-line bg-surface-2 p-3">
-            <div>
-              <p className="text-[14px] font-semibold">{t('session.setup.courts.customRounds', { n: targetRounds })}</p>
-              <p className="text-[12px] text-ink-muted">{t('session.setup.courts.customEstimate', { min: targetRounds * 15 })}</p>
+        {rounds !== null ? (
+          <div className="flex items-center justify-between gap-4 rounded-md border border-line bg-surface-2 p-3">
+            <div className="min-w-0">
+              <p className="text-[15px] font-semibold">{t('session.setup.courts.customRounds', { n: rounds })}</p>
+              {targetRounds === 'auto' ? <p className="text-[12px] text-ink-muted">{t('session.setup.courts.autoHint')}</p> : null}
             </div>
             <Stepper
-              value={targetRounds}
+              value={rounds}
               min={1}
               max={LIMITS.rounds}
               onChange={(n) => patch({ targetRounds: n })}
@@ -126,11 +122,7 @@ export function SetupCourtsStep({ plugin, playerCount, shape }: Props) {
               increaseLabel={t('common.increase')}
             />
           </div>
-        ) : (
-          <p className="rounded-md border border-line bg-surface-2 p-3 text-[13px] text-ink-muted">
-            {t('session.setup.courts.openEndedNote')}
-          </p>
-        )}
+        ) : null}
       </section>
     </div>
   );

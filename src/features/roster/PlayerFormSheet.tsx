@@ -84,7 +84,6 @@ function Form({ onClose, hostId, player, onDeleted }: Omit<Props, 'open'>) {
         isGuest: guest,
       });
     }
-    toast.success(t('roster.saved'));
     onClose();
   };
 
@@ -188,7 +187,6 @@ function Form({ onClose, hostId, player, onDeleted }: Omit<Props, 'open'>) {
                 variant="secondary"
                 onClick={() => {
                   rosterRepo.restore(hostId, player.id);
-                  toast.success(t('roster.restored'));
                   onClose();
                 }}
               >

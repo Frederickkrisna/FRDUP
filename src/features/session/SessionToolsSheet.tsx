@@ -58,12 +58,7 @@ export function SessionToolsSheet({ open, onClose }: { open: boolean; onClose: (
 
   const toggleCourt = (courtId: string, label: string, active: boolean) => {
     const res = setCourtActive(courtId, active);
-    if (!res.ok) {
-      if (res.error === 'last_court') toast.warning(t('session.tools.lastCourt'));
-      return;
-    }
-    const key = active ? (res.appliedNow ? 'courtOnNow' : 'courtOnNext') : res.appliedNow ? 'courtOffNow' : 'courtOffNext';
-    toast.info(t(`session.tools.${key}`, { court: label }));
+    if (!res.ok && res.error === 'last_court') toast.warning(t('session.tools.lastCourt'));
   };
 
   return (
@@ -113,7 +108,6 @@ export function SessionToolsSheet({ open, onClose }: { open: boolean; onClose: (
                       className="pressable flex min-h-12 w-full items-center gap-3 rounded-md px-2 text-left"
                       onClick={() => {
                         addParticipant(participantFromPlayer(p));
-                        toast.success(t('session.tools.playerAdded', { name: displayName(p) }));
                         setAdding(false);
                       }}
                     >
@@ -135,7 +129,6 @@ export function SessionToolsSheet({ open, onClose }: { open: boolean; onClose: (
                     disabled={present.length <= 2}
                     onClick={() => {
                       removeParticipant(p.playerId);
-                      toast.success(t('session.tools.playerLeft', { name: displayName(p) }));
                     }}
                     aria-label={t('session.tools.removePlayer', { name: displayName(p) })}
                     className="pressable grid size-11 place-items-center rounded-full text-ink-muted disabled:opacity-30"
